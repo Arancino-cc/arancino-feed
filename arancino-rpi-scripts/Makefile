@@ -35,6 +35,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_DIR) $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/usr/lib/
 	$(INSTALL_DIR) $(1)/osjs
+	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DIR) $(1)/etc/init.d
 
 	# /etc/config DIR
