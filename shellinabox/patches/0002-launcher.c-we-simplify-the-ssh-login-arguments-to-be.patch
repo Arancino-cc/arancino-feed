@@ -1,0 +1,57 @@
+From 4f484338b258dd46aab97606677db8e3011ad160 Mon Sep 17 00:00:00 2001
+From: Arturo Rinaldi <arty.net2@gmail.com>
+Date: Thu, 21 Sep 2017 02:27:02 +0200
+Subject: [PATCH 2/3] launcher.c : we simplify the ssh login arguments to be
+ used with Dropbear
+
+---
+ shellinabox/service.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
+
+diff --git a/shellinabox/service.c b/shellinabox/service.c
+index cdf946e..8e302b4 100644
+--- a/shellinabox/service.c
++++ b/shellinabox/service.c
+@@ -117,12 +117,12 @@ void initService(struct Service *service, const char *arg) {
+     service->useDefaultShell                = 0;
+     service->uid                            = -1;
+     service->gid                            = -1;
+-    service->user                           = NULL;
+-    service->group                          = NULL;
+-    check(service->cwd                      = strdup("/"));
++    service->user                           = strdup("root");
++    service->group                          = strdup("root");
++    check(service->cwd                      = strdup("/root"));
+     char *host;
+     char *sshPort;
+-    check(host                              = strdup("localhost"));
++    check(host                              = strdup("127.0.0.1"));
+     check(sshPort                           = strdup("22"));
+ 
+     if ((ptr                                = strchr(arg, ':')) != NULL) {
+@@ -169,20 +169,12 @@ void initService(struct Service *service, const char *arg) {
+     }
+ 
+     service->cmdline                        = stringPrintf(NULL,
+-      "ssh -a -e none -i /dev/null -x -oChallengeResponseAuthentication=no "
+-          "-oCheckHostIP=no -oClearAllForwardings=yes -oCompression=no "
+-          "-oControlMaster=no -oGSSAPIAuthentication=no "
+-          "-oHostbasedAuthentication=no -oIdentitiesOnly=yes "
+-          "-oKbdInteractiveAuthentication=yes -oPasswordAuthentication=yes "
+-          "-oPreferredAuthentications=keyboard-interactive,password "
+-          "-oPubkeyAuthentication=no -oRhostsRSAAuthentication=no "
+-          "-oRSAAuthentication=no -oStrictHostKeyChecking=no -oTunnel=no "
+-          "-oUserKnownHostsFile=/dev/null -oVerifyHostKeyDNS=no "
++      "ssh "
+ // beewoolie-2012.03.30: while it would be nice to disable this
+ //          feature, we cannot be sure that it is available on the
+ //          target server.  Removing it for the sake of Centos.
+ //          "-oVisualHostKey=no"
+-          " -oLogLevel=FATAL -p%s %%s@%s",sshPort,  host);
++          " -p%s %%s@%s",sshPort,  host);
+     free(host);
+     free(sshPort);
+   } else {
+-- 
+2.14.1
+

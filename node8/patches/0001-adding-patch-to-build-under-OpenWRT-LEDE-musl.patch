@@ -1,0 +1,262 @@
+From 639e029ec6dca7363dc79e348f3ab9e7c82cfc15 Mon Sep 17 00:00:00 2001
+From: Arturo Rinaldi <arty.net2@gmail.com>
+Date: Sat, 19 Aug 2017 02:23:31 +0200
+Subject: [PATCH] adding patch to build under OpenWRT-LEDE/musl
+
+---
+ deps/npm/lib/config/defaults.js                    |  4 +-
+ .../node-gyp/gyp/pylib/gyp/generator/make.py       | 62 +++++++++++++++++++--
+ deps/uv/src/unix/getaddrinfo.c                     |  1 +
+ deps/v8/src/base/cpu.cc                            |  1 +
+ lib/module.js                                      |  3 +-
+ tools/gyp/pylib/gyp/generator/make.py              | 64 ++++++++++++++++++++--
+ 6 files changed, 123 insertions(+), 12 deletions(-)
+
+diff --git a/deps/npm/lib/config/defaults.js b/deps/npm/lib/config/defaults.js
+index 93bac84a61..c063509986 100644
+--- a/deps/npm/lib/config/defaults.js
++++ b/deps/npm/lib/config/defaults.js
+@@ -166,7 +166,7 @@ Object.defineProperty(exports, 'defaults', {get: function () {
+     'legacy-bundling': false,
+     link: false,
+     'local-address': undefined,
+-    loglevel: 'notice',
++    loglevel: 'info',
+     logstream: process.stderr,
+     'logs-max': 10,
+     long: false,
+@@ -215,7 +215,7 @@ Object.defineProperty(exports, 'defaults', {get: function () {
+     'sign-git-tag': false,
+     'sso-poll-frequency': 500,
+     'sso-type': 'oauth',
+-    'strict-ssl': true,
++    'strict-ssl': false,
+     tag: 'latest',
+     'tag-version-prefix': 'v',
+     timing: false,
+diff --git a/deps/npm/node_modules/node-gyp/gyp/pylib/gyp/generator/make.py b/deps/npm/node_modules/node-gyp/gyp/pylib/gyp/generator/make.py
+index 64b9dd267b..1ddd95b86b 100644
+--- a/deps/npm/node_modules/node-gyp/gyp/pylib/gyp/generator/make.py
++++ b/deps/npm/node_modules/node-gyp/gyp/pylib/gyp/generator/make.py
+@@ -144,6 +144,30 @@ cmd_alink_thin = rm -f $@ && $(AR.$(TOOLSET)) crsT $@ $(filter %.o,$^)
+ quiet_cmd_link = LINK($(TOOLSET)) $@
+ cmd_link = $(LINK.$(TOOLSET)) $(GYP_LDFLAGS) $(LDFLAGS.$(TOOLSET)) -o $@ -Wl,--start-group $(LD_INPUTS) -Wl,--end-group $(LIBS)
+ 
++define xargs
++$(1) $(wordlist 1,1000,$(2))
++$(if $(word 1001,$(2)),$(call xargs,$(1),$(wordlist 1001,$(words $(2)),$(2))))
++endef
++
++define write-to-file
++@: >$(1)
++$(call xargs,@printf "%s\\n" >>$(1),$(2))
++endef
++
++OBJ_FILE_LIST := ar-file-list
++
++define create_archive
++        rm -f $(1) $(1).$(OBJ_FILE_LIST); mkdir -p `dirname $(1)`
++        $(call write-to-file,$(1).$(OBJ_FILE_LIST),$(filter %.o,$(2)))
++        $(AR.$(TOOLSET)) crs $(1) @$(1).$(OBJ_FILE_LIST)
++endef
++
++define create_thin_archive
++        rm -f $(1) $(OBJ_FILE_LIST); mkdir -p `dirname $(1)`
++        $(call write-to-file,$(1).$(OBJ_FILE_LIST),$(filter %.o,$(2)))
++        $(AR.$(TOOLSET)) crsT $(1) @$(1).$(OBJ_FILE_LIST)
++endef
++
+ # We support two kinds of shared objects (.so):
+ # 1) shared_library, which is just bundling together many dependent libraries
+ # into a link line.
+@@ -188,6 +212,30 @@ cmd_alink = rm -f $@ && $(AR.$(TOOLSET)) crs $@ $(filter %.o,$^)
+ quiet_cmd_alink_thin = AR($(TOOLSET)) $@
+ cmd_alink_thin = rm -f $@ && $(AR.$(TOOLSET)) crsT $@ $(filter %.o,$^)
+ 
++define xargs
++$(1) $(wordlist 1,1000,$(2))
++$(if $(word 1001,$(2)),$(call xargs,$(1),$(wordlist 1001,$(words $(2)),$(2))))
++endef
++
++define write-to-file
++@: >$(1)
++$(call xargs,@printf "%s\\n" >>$(1),$(2))
++endef
++
++OBJ_FILE_LIST := ar-file-list
++
++define create_archive
++        rm -f $(1) $(1).$(OBJ_FILE_LIST); mkdir -p `dirname $(1)`
++        $(call write-to-file,$(1).$(OBJ_FILE_LIST),$(filter %.o,$(2)))
++        $(AR.$(TOOLSET)) crs $(1) @$(1).$(OBJ_FILE_LIST)
++endef
++
++define create_thin_archive
++        rm -f $(1) $(OBJ_FILE_LIST); mkdir -p `dirname $(1)`
++        $(call write-to-file,$(1).$(OBJ_FILE_LIST),$(filter %.o,$(2)))
++        $(AR.$(TOOLSET)) crsT $(1) @$(1).$(OBJ_FILE_LIST)
++endef
++
+ # Due to circular dependencies between libraries :(, we wrap the
+ # special "figure out circular dependencies" flags around the entire
+ # input list during linking.
+@@ -1581,11 +1629,17 @@ $(obj).$(TOOLSET)/$(TARGET)/%%.o: $(obj)/%%%s FORCE_DO_CMD
+             "Spaces in alink input filenames not supported (%s)"  % link_dep)
+       if (self.flavor not in ('mac', 'openbsd', 'netbsd', 'win') and not
+           self.is_standalone_static_library):
+-        self.WriteDoCmd([self.output_binary], link_deps, 'alink_thin',
+-                        part_of_all, postbuilds=postbuilds)
++        if self.flavor in ('linux', 'android'):
++          self.WriteMakeRule([self.output_binary], link_deps, actions = ['$(call create_thin_archive,$@,$^)'])
++        else:
++          self.WriteDoCmd([self.output_binary], link_deps, 'alink_thin',
++                          part_of_all, postbuilds=postbuilds)
+       else:
+-        self.WriteDoCmd([self.output_binary], link_deps, 'alink', part_of_all,
+-                        postbuilds=postbuilds)
++        if self.flavor in ('linux', 'android'):
++          self.WriteMakeRule([self.output_binary], link_deps, actions = ['$(call create_archive,$@,$^)'])
++        else:
++          self.WriteDoCmd([self.output_binary], link_deps, 'alink', part_of_all,
++                          postbuilds=postbuilds)
+     elif self.type == 'shared_library':
+       self.WriteLn('%s: LD_INPUTS := %s' % (
+             QuoteSpaces(self.output_binary),
+diff --git a/deps/uv/src/unix/getaddrinfo.c b/deps/uv/src/unix/getaddrinfo.c
+index 2049aea2f3..dde17b9068 100644
+--- a/deps/uv/src/unix/getaddrinfo.c
++++ b/deps/uv/src/unix/getaddrinfo.c
+@@ -99,6 +99,7 @@ static void uv__getaddrinfo_work(struct uv__work* w) {
+   int err;
+ 
+   req = container_of(w, uv_getaddrinfo_t, work_req);
++  req->hints->ai_flags &= ~AI_V4MAPPED;
+   err = getaddrinfo(req->hostname, req->service, req->hints, &req->addrinfo);
+   req->retcode = uv__getaddrinfo_translate_error(err);
+ }
+diff --git a/deps/v8/src/base/cpu.cc b/deps/v8/src/base/cpu.cc
+index bf530c6281..8f780dfe15 100644
+--- a/deps/v8/src/base/cpu.cc
++++ b/deps/v8/src/base/cpu.cc
+@@ -144,6 +144,7 @@ int __detect_fp64_mode(void) {
+       ".set push\n\t"
+       ".set noreorder\n\t"
+       ".set oddspreg\n\t"
++      ".set hardfloat\n\t"
+       "lui $t0, 0x3FF0\n\t"
+       "ldc1 $f0, %0\n\t"
+       "mtc1 $t0, $f1\n\t"
+diff --git a/lib/module.js b/lib/module.js
+index d02a676c90..f54b56032b 100644
+--- a/lib/module.js
++++ b/lib/module.js
+@@ -686,7 +686,8 @@ Module._initPaths = function() {
+   } else {
+     prefixDir = path.resolve(process.execPath, '..', '..');
+   }
+-  var paths = [path.resolve(prefixDir, 'lib', 'node')];
++  var paths = [path.resolve(prefixDir, 'lib', 'node'),
++               path.resolve(prefixDir, 'lib', 'node_modules')];
+ 
+   if (homeDir) {
+     paths.unshift(path.resolve(homeDir, '.node_libraries'));
+diff --git a/tools/gyp/pylib/gyp/generator/make.py b/tools/gyp/pylib/gyp/generator/make.py
+index f7f519b3e6..6f7cc23442 100644
+--- a/tools/gyp/pylib/gyp/generator/make.py
++++ b/tools/gyp/pylib/gyp/generator/make.py
+@@ -149,6 +149,30 @@ cmd_alink_thin = rm -f $@ && $(AR.$(TOOLSET)) crsT $@ $(filter %.o,$^)
+ quiet_cmd_link = LINK($(TOOLSET)) $@
+ cmd_link = $(LINK.$(TOOLSET)) $(GYP_LDFLAGS) $(LDFLAGS.$(TOOLSET)) -o $@ -Wl,--start-group $(LD_INPUTS) $(LIBS) -Wl,--end-group
+ 
++define xargs
++$(1) $(wordlist 1,1000,$(2))
++$(if $(word 1001,$(2)),$(call xargs,$(1),$(wordlist 1001,$(words $(2)),$(2))))
++endef
++
++define write-to-file
++@: >$(1)
++$(call xargs,@printf "%s\\n" >>$(1),$(2))
++endef
++
++OBJ_FILE_LIST := ar-file-list
++
++define create_archive
++        rm -f $(1) $(1).$(OBJ_FILE_LIST); mkdir -p `dirname $(1)`
++        $(call write-to-file,$(1).$(OBJ_FILE_LIST),$(filter %.o,$(2)))
++        $(AR.$(TOOLSET)) crs $(1) @$(1).$(OBJ_FILE_LIST)
++endef
++
++define create_thin_archive
++        rm -f $(1) $(OBJ_FILE_LIST); mkdir -p `dirname $(1)`
++        $(call write-to-file,$(1).$(OBJ_FILE_LIST),$(filter %.o,$(2)))
++        $(AR.$(TOOLSET)) crsT $(1) @$(1).$(OBJ_FILE_LIST)
++endef
++
+ # We support two kinds of shared objects (.so):
+ # 1) shared_library, which is just bundling together many dependent libraries
+ # into a link line.
+@@ -177,7 +201,7 @@ quiet_cmd_alink = LIBTOOL-STATIC $@
+ cmd_alink = rm -f $@ && ./gyp-mac-tool filter-libtool libtool $(GYP_LIBTOOLFLAGS) -static -o $@ $(filter %.o,$^)
+ 
+ quiet_cmd_link = LINK($(TOOLSET)) $@
+-cmd_link = $(LINK.$(TOOLSET)) $(GYP_LDFLAGS) $(LDFLAGS.$(TOOLSET)) -o "$@" $(LD_INPUTS) $(LIBS)
++cmd_link = $(CXX.$(TOOLSET)) $(GYP_LDFLAGS) $(LDFLAGS.$(TOOLSET)) -o "$@" $(LD_INPUTS) $(LIBS)
+ 
+ quiet_cmd_solink = SOLINK($(TOOLSET)) $@
+ cmd_solink = $(LINK.$(TOOLSET)) -shared $(GYP_LDFLAGS) $(LDFLAGS.$(TOOLSET)) -o "$@" $(LD_INPUTS) $(LIBS)
+@@ -193,6 +217,30 @@ cmd_alink = rm -f $@ && $(AR.$(TOOLSET)) crs $@ $(filter %.o,$^)
+ quiet_cmd_alink_thin = AR($(TOOLSET)) $@
+ cmd_alink_thin = rm -f $@ && $(AR.$(TOOLSET)) crsT $@ $(filter %.o,$^)
+ 
++define xargs
++$(1) $(wordlist 1,1000,$(2))
++$(if $(word 1001,$(2)),$(call xargs,$(1),$(wordlist 1001,$(words $(2)),$(2))))
++endef
++
++define write-to-file
++@: >$(1)
++$(call xargs,@printf "%s\\n" >>$(1),$(2))
++endef
++
++OBJ_FILE_LIST := ar-file-list
++
++define create_archive
++        rm -f $(1) $(1).$(OBJ_FILE_LIST); mkdir -p `dirname $(1)`
++        $(call write-to-file,$(1).$(OBJ_FILE_LIST),$(filter %.o,$(2)))
++        $(AR.$(TOOLSET)) crs $(1) @$(1).$(OBJ_FILE_LIST)
++endef
++
++define create_thin_archive
++        rm -f $(1) $(OBJ_FILE_LIST); mkdir -p `dirname $(1)`
++        $(call write-to-file,$(1).$(OBJ_FILE_LIST),$(filter %.o,$(2)))
++        $(AR.$(TOOLSET)) crsT $(1) @$(1).$(OBJ_FILE_LIST)
++endef
++
+ # Due to circular dependencies between libraries :(, we wrap the
+ # special "figure out circular dependencies" flags around the entire
+ # input list during linking.
+@@ -1589,11 +1637,17 @@ $(obj).$(TOOLSET)/$(TARGET)/%%.o: $(obj)/%%%s FORCE_DO_CMD
+             "Spaces in alink input filenames not supported (%s)"  % link_dep)
+       if (self.flavor not in ('mac', 'openbsd', 'netbsd', 'win') and not
+           self.is_standalone_static_library):
+-        self.WriteDoCmd([self.output_binary], link_deps, 'alink_thin',
+-                        part_of_all, postbuilds=postbuilds)
++        if self.flavor in ('linux', 'android'):
++          self.WriteMakeRule([self.output_binary], link_deps, actions = ['$(call create_thin_archive,$@,$^)'])
++        else:
++          self.WriteDoCmd([self.output_binary], link_deps, 'alink_thin',
++                          part_of_all, postbuilds=postbuilds)
+       else:
+-        self.WriteDoCmd([self.output_binary], link_deps, 'alink', part_of_all,
+-                        postbuilds=postbuilds)
++        if self.flavor in ('linux', 'android'):
++          self.WriteMakeRule([self.output_binary], link_deps, actions = ['$(call create_archive,$@,$^)'])
++        else:
++          self.WriteDoCmd([self.output_binary], link_deps, 'alink', part_of_all,
++                          postbuilds=postbuilds)
+     elif self.type == 'shared_library':
+       self.WriteLn('%s: LD_INPUTS := %s' % (
+             QuoteSpaces(self.output_binary),
+-- 
+2.14.1
+

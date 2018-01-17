@@ -1,0 +1,40 @@
+From 1bd3b6b6cbf4eee76a7985e138b50a282d66352e Mon Sep 17 00:00:00 2001
+From: Arturo Rinaldi <arty.net2@gmail.com>
+Date: Thu, 21 Sep 2017 02:30:46 +0200
+Subject: [PATCH 3/3] launcher.c : adding a little debugging
+
+---
+ shellinabox/launcher.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/shellinabox/launcher.c b/shellinabox/launcher.c
+index f8b25be..7153c93 100644
+--- a/shellinabox/launcher.c
++++ b/shellinabox/launcher.c
+@@ -562,6 +562,7 @@ int launchChild(int service, struct Session *session, const char *url) {
+     return -1;
+   }
+   check(bytes == sizeof(pid));
++  debug("line: %04d, pid: %d ", __LINE__, pid);
+   check(session->pid = pid);
+   struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+   check(cmsg);
+@@ -1828,6 +1829,7 @@ static void launcherDaemon(int fd) {
+         addToHashMap(childProcesses, utmp->pid, (char *)utmp);
+         debug("[server] Child %d launched", pid);
+       } else {
++        error("[server] Call to forkPty() failed! | pid: %d", pid);
+         int fds[2];
+         if (!pipe(fds)) {
+           NOINTR(write(fds[1], "forkpty() failed\r\n", 18));
+@@ -1837,6 +1839,7 @@ static void launcherDaemon(int fd) {
+         }
+       }
+ 
++      debug("line: %04d, pid: %d", __LINE__, pid);
+       // Send file handle and process id back to parent
+       char cmsg_buf[CMSG_SPACE(sizeof(int))]; // = { 0 }; // Valid initializer makes OSX mad.
+       memset (cmsg_buf, 0, sizeof (cmsg_buf)); // Quiet complaint from valgrind
+-- 
+2.14.1
+
