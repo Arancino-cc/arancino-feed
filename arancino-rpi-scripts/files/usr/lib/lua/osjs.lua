@@ -630,7 +630,7 @@ local function get_wizard_board_config_command(info)
   -- ... and so on
   local commandline = table.concat(tbl, " ")
 
-  return "sh " .. ROOTDIR .. "/bin/arduino-wizard-board-config.sh " .. commandline
+  return "sh " .. ROOTDIR .. "/bin/arancino-wizard-board-config.sh " .. commandline
 end
 
 
@@ -704,7 +704,7 @@ function api_request(request, response, meth, iargs)
       metrics = metrics,
       hostname = sys.hostname(),
       timezone = timezone,
-      rest = console("sh " .. ROOTDIR .. "/bin/arduino-toggle-rest-api.sh")
+      rest = console("sh " .. ROOTDIR .. "/bin/arancino-toggle-rest-api.sh")
     }
   elseif meth == "setsysinfo" then
     local hostname = iargs.hostname or sys.hostname()
@@ -733,14 +733,14 @@ function api_request(request, response, meth, iargs)
   elseif meth == "netinfo" then
     data = {
       deviceinfo = sys.net.deviceinfo(),
-      ifconfig = json.decode(console("sh " .. ROOTDIR .. "/bin/arduino-ifconfig.sh"))
+      ifconfig = json.decode(console("sh " .. ROOTDIR .. "/bin/arancino-ifconfig.sh"))
     }
   elseif meth == "iwinfo" then
     -- local device = iargs["device"] or "wlan0"
     -- data = sys.wifi.getiwinfo(device)
-    data = json.decode(console("sh " .. ROOTDIR .. "/bin/arduino-wifi-info.sh"))
+    data = json.decode(console("sh " .. ROOTDIR .. "/bin/arancino-wifi-info.sh"))
   elseif meth == "rest" then
-    data = console("sh " .. ROOTDIR .. "/bin/arduino-toggle-rest-api.sh " .. iargs["enabled"])
+    data = console("sh " .. ROOTDIR .. "/bin/arancino-toggle-rest-api.sh " .. iargs["enabled"])
   elseif meth == "iwscan" then
     local device = iargs["device"] or "radio0"
     data = get_wlans(device)
@@ -758,7 +758,7 @@ function api_request(request, response, meth, iargs)
   elseif meth == "wifi" then
     local cssid = iargs["ssid"]:gsub("%$", "\\$")
     local cpass = iargs["password"]:gsub("%$", "\\$")
-    data = console("sh " .. ROOTDIR .. '/bin/arduino-wifi-connect.sh "' .. cssid .. '" ' ..  iargs["security"] .. ' "' .. cpass .. '" ' .. iargs['netrestart'], true)
+    data = console("sh " .. ROOTDIR .. '/bin/arancino-wifi-connect.sh "' .. cssid .. '" ' ..  iargs["security"] .. ' "' .. cpass .. '" ' .. iargs['netrestart'], true)
   elseif meth == "opkg" then
     if iargs["command"] == "list" then
       data = console("opkg update")
