@@ -37,7 +37,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_DIR) $(1)/osjs
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_DIR) $(1)/etc/smartme
+	#$(INSTALL_DIR) $(1)/etc/smartme
 
 	# /etc
 	$(INSTALL_DATA) ./files/etc/rc.local $(1)/etc
@@ -49,13 +49,16 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config/
 	$(INSTALL_CONF) ./files/etc/config/smartme $(1)/etc/config
 
-	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
-
 	# /usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/smartme-wifi-connect $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/wifi-live-or-reset $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/wifi-reload $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/wifi-reset-and-reboot $(1)/usr/bin
+
+	# /etc/init.d
+	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
+	#$(INSTALL_BIN) ./files/etc/init.d/generate_new_gpg_key $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/etc/init.d/handle_wifi_reset $(1)/etc/init.d
 
 	$(CP) ./files/osjs/* $(1)/osjs
 	$(CP) ./files/usr/lib/* $(1)/usr/lib
