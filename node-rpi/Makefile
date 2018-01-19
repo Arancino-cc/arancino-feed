@@ -7,7 +7,7 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=node
+PKG_NAME:=node-rpi
 PKG_VERSION:=v6.11.4
 PKG_RELEASE:=1
 
@@ -29,7 +29,7 @@ PKG_LICENSE_FILES:=LICENSE
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/node
+define Package/node-rpi
   SECTION:=lang
   CATEGORY:=Languages
   SUBMENU:=Node.js
@@ -38,13 +38,13 @@ define Package/node
   DEPENDS:=+libstdcpp +libopenssl +zlib +USE_UCLIBC:libpthread +USE_UCLIBC:librt +NODEJS_ICU:icu
 endef
 
-define Package/node/description
+define Package/node-rpi/description
   Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine. Node.js uses
   an event-driven, non-blocking I/O model that makes it lightweight and efficient. Node.js'
    package ecosystem, npm, is the largest ecosystem of open source libraries in the world.
 endef
 
-define Package/node/config
+define Package/node-rpi/config
 	menu "Module Selection"
 
 	config NODEJS_ICU
@@ -144,7 +144,7 @@ CONFIGURE_ARGS+= \
 	--with-intl=none
 endif
 
-define Package/node/install
+define Package/node-rpi/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/node $(1)/usr/bin/
 
@@ -153,4 +153,4 @@ define Package/node/install
 	$(LN) ../lib/node_modules/npm/bin/npm-cli.js $(1)/usr/bin/npm
 endef
 
-$(eval $(call BuildPackage,node))
+$(eval $(call BuildPackage,node-rpi))
