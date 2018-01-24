@@ -23,206 +23,206 @@
 
       if ( !_cache ) {
         _cache = {
-    "ApplicationArduinoAbout": {
-        "className": "ApplicationArduinoAbout",
+    "ApplicationArancinoAbout": {
+        "className": "ApplicationArancinoAbout",
         "name": "About Arancino OS",
         "singular": true,
         "enabled": true,
         "mime": null,
         "icon": "apps/help-browser.png",
-        "category": "arduino",
+        "category": "arancino",
         "preload": [
             {
                 "type": "javascript",
-                "src": "target/ArduinoAbout/combined.js"
+                "src": "target/ArancinoAbout/combined.js"
             },
             {
                 "type": "stylesheet",
-                "src": "target/ArduinoAbout/combined.css"
+                "src": "target/ArancinoAbout/combined.css"
             }
         ],
         "type": "application",
-        "path": "target/ArduinoAbout",
+        "path": "target/ArancinoAbout",
         "build": {},
         "repo": "target"
     },
-    "ApplicationArduinoCiaoConfigurator": {
-        "className": "ApplicationArduinoCiaoConfigurator",
-        "name": "Arancino Ciao Configurator",
-        "mime": null,
-        "icon": "categories/applications-system.png",
-        "category": "arduino",
-        "preload": [
-            {
-                "type": "javascript",
-                "src": "target/ArduinoCiaoConfigurator/combined.js"
-            },
-            {
-                "type": "stylesheet",
-                "src": "target/ArduinoCiaoConfigurator/combined.css"
-            }
-        ],
-        "type": "application",
-        "path": "target/ArduinoCiaoConfigurator",
-        "build": {},
-        "repo": "target",
-        "enabled": true
-    },
-    "ApplicationArduinoKernelLog": {
-        "className": "ApplicationArduinoKernelLog",
+    // "ApplicationArancinoCiaoConfigurator": {
+    //     "className": "ApplicationArancinoCiaoConfigurator",
+    //     "name": "Arancino Ciao Configurator",
+    //     "mime": null,
+    //     "icon": "categories/applications-system.png",
+    //     "category": "arancino",
+    //     "preload": [
+    //         {
+    //             "type": "javascript",
+    //             "src": "target/ArancinoCiaoConfigurator/combined.js"
+    //         },
+    //         {
+    //             "type": "stylesheet",
+    //             "src": "target/ArancinoCiaoConfigurator/combined.css"
+    //         }
+    //     ],
+    //     "type": "application",
+    //     "path": "target/ArancinoCiaoConfigurator",
+    //     "build": {},
+    //     "repo": "target",
+    //     "enabled": false
+    // },
+    "ApplicationArancinoKernelLog": {
+        "className": "ApplicationArancinoKernelLog",
         "name": "Arancino Kernel Log",
         "mime": null,
         "icon": "apps/terminal.png",
-        "category": "arduino",
+        "category": "arancino",
         "preload": [
             {
                 "type": "javascript",
-                "src": "target/ArduinoKernelLog/combined.js"
+                "src": "target/ArancinoKernelLog/combined.js"
             },
             {
                 "type": "stylesheet",
-                "src": "target/ArduinoKernelLog/combined.css"
+                "src": "target/ArancinoKernelLog/combined.css"
             }
         ],
         "type": "application",
-        "path": "target/ArduinoKernelLog",
+        "path": "target/ArancinoKernelLog",
         "build": {},
         "repo": "target",
         "enabled": true
     },
-    "ApplicationArduinoLuci": {
-        "className": "ApplicationArduinoLuci",
+    "ApplicationArancinoLuci": {
+        "className": "ApplicationArancinoLuci",
         "name": "Arancino Luci",
         "mime": null,
         "icon": "categories/applications-system.png",
-        "category": "arduino",
+        "category": "arancino",
         "preload": [
             {
                 "type": "javascript",
-                "src": "target/ArduinoLuci/combined.js"
+                "src": "target/ArancinoLuci/combined.js"
             },
             {
                 "type": "stylesheet",
-                "src": "target/ArduinoLuci/combined.css"
+                "src": "target/ArancinoLuci/combined.css"
             }
         ],
         "type": "application",
-        "path": "target/ArduinoLuci",
+        "path": "target/ArancinoLuci",
         "build": {},
         "repo": "target",
         "enabled": true
     },
-    "ApplicationArduinoPackageManager": {
-        "className": "ApplicationArduinoPackageManager",
+    "ApplicationArancinoPackageManager": {
+        "className": "ApplicationArancinoPackageManager",
         "name": "Arancino Package Manager",
         "mime": [
             "application\\/x\\-ipkg"
         ],
         "icon": "apps/update-manager.png",
         "singular": true,
-        "category": "arduino",
+        "category": "arancino",
         "preload": [
             {
                 "type": "javascript",
-                "src": "target/ArduinoPackageManager/combined.js"
+                "src": "target/ArancinoPackageManager/combined.js"
             },
             {
                 "type": "stylesheet",
-                "src": "target/ArduinoPackageManager/combined.css"
+                "src": "target/ArancinoPackageManager/combined.css"
             }
         ],
         "type": "application",
-        "path": "target/ArduinoPackageManager",
+        "path": "target/ArancinoPackageManager",
         "build": {},
         "repo": "target",
         "enabled": true
     },
-    "ApplicationArduinoProcessViewer": {
-        "className": "ApplicationArduinoProcessViewer",
+    "ApplicationArancinoProcessViewer": {
+        "className": "ApplicationArancinoProcessViewer",
         "name": "Arancino Process Viewer",
         "mime": null,
         "icon": "apps/gnome-monitor.png",
-        "category": "arduino",
+        "category": "arancino",
         "preload": [
             {
                 "type": "javascript",
-                "src": "target/ArduinoProcessViewer/combined.js"
+                "src": "target/ArancinoProcessViewer/combined.js"
             },
             {
                 "type": "stylesheet",
-                "src": "target/ArduinoProcessViewer/combined.css"
+                "src": "target/ArancinoProcessViewer/combined.css"
             }
         ],
         "type": "application",
-        "path": "target/ArduinoProcessViewer",
+        "path": "target/ArancinoProcessViewer",
         "build": {},
         "repo": "target",
         "enabled": true
     },
-    "ArduinoService": {
-        "className": "ArduinoService",
+    "ArancinoService": {
+        "className": "ArancinoService",
         "type": "service",
-        "name": "ArduinoService",
+        "name": "ArancinoService",
         "icon": "categories/applications-system.png",
         "preload": [
             {
                 "type": "javascript",
-                "src": "target/ArduinoService/combined.js"
+                "src": "target/ArancinoService/combined.js"
             }
         ],
-        "path": "target/ArduinoService",
+        "path": "target/ArancinoService",
         "build": {},
         "repo": "target",
         "enabled": true,
         "singular": true
     },
-    "ApplicationArduinoSettings": {
-        "className": "ApplicationArduinoSettings",
+    "ApplicationArancinoSettings": {
+        "className": "ApplicationArancinoSettings",
         "name": "Arancino Settings",
         "mime": null,
-        "icon": "arduino-settings.png",
+        "icon": "arancino-settings.png",
         "singular": true,
-        "category": "arduino",
+        "category": "arancino",
         "preload": [
             {
                 "type": "javascript",
-                "src": "target/ArduinoSettings/combined.js"
+                "src": "target/ArancinoSettings/combined.js"
             },
             {
                 "type": "stylesheet",
-                "src": "target/ArduinoSettings/combined.css"
+                "src": "target/ArancinoSettings/combined.css"
             }
         ],
         "type": "application",
-        "path": "target/ArduinoSettings",
+        "path": "target/ArancinoSettings",
         "build": {},
         "repo": "target",
         "enabled": true
     },
-    "ApplicationArduinoSysLog": {
-        "className": "ApplicationArduinoSysLog",
+    "ApplicationArancinoSysLog": {
+        "className": "ApplicationArancinoSysLog",
         "name": "Arancino System Log",
         "mime": null,
         "icon": "apps/terminal.png",
-        "category": "arduino",
+        "category": "arancino",
         "preload": [
             {
                 "type": "javascript",
-                "src": "target/ArduinoSysLog/combined.js"
+                "src": "target/ArancinoSysLog/combined.js"
             },
             {
                 "type": "stylesheet",
-                "src": "target/ArduinoSysLog/combined.css"
+                "src": "target/ArancinoSysLog/combined.css"
             }
         ],
         "type": "application",
-        "path": "target/ArduinoSysLog",
+        "path": "target/ArancinoSysLog",
         "build": {},
         "repo": "target",
         "enabled": true
     },
-    "ApplicationArduinoWizardSettings": {
-        "className": "ApplicationArduinoWizardSettings",
+    "ApplicationArancinoWizardSettings": {
+        "className": "ApplicationArancinoWizardSettings",
         "name": "Arancino Configuration Wizard",
         "mime": null,
         "icon": "categories/applications-system.png",
@@ -230,15 +230,15 @@
         "preload": [
             {
                 "type": "javascript",
-                "src": "target/ArduinoWizardSettings/combined.js"
+                "src": "target/ArancinoWizardSettings/combined.js"
             },
             {
                 "type": "stylesheet",
-                "src": "target/ArduinoWizardSettings/combined.css"
+                "src": "target/ArancinoWizardSettings/combined.css"
             }
         ],
         "type": "application",
-        "path": "target/ArduinoWizardSettings",
+        "path": "target/ArancinoWizardSettings",
         "build": {},
         "repo": "target",
         "enabled": true
@@ -291,7 +291,7 @@
             "text\\/x\\-cplusplus",
             "application\\/javascript"
         ],
-        "icon": "arduino-ideino.png",
+        "icon": "arancino-ideino.png",
         "category": "development",
         "preload": [
             {

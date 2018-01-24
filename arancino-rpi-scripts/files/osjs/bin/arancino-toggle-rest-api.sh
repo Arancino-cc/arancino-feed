@@ -6,10 +6,10 @@
 #
 
 if [ ! -n "$1" ]; then
-  /sbin/uci get arduino.@arduino[0].secure_rest_api
+  #/sbin/uci get arancino.@arancino[0].secure_rest_api
   exit 0
 fi
 
-/sbin/uci set arduino.@arduino[0].secure_rest_api=$1
-/sbin/uci commit arduino
+#/sbin/uci set arancino.@arancino[0].secure_rest_api=$1
+#/sbin/uci commit arancino
 echo "true"
