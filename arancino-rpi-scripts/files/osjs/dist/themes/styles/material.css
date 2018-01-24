@@ -152,7 +152,7 @@ corewm-notification .Message {
 /* Window Switcher */
 corewm-window-switcher {
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.6);
-  background: #fdb882;
+  background: #f6f6f6;
 }
 corewm-window-switcher > div.Active {
   background: #2d73d2;
@@ -171,7 +171,7 @@ application-window {
 }
 application-window:before {
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.3);
-  background: #fdb882;
+  background: #f6f6f6;
   top: calc(-34px);
   left: 0;
   right: 0;
@@ -457,7 +457,7 @@ gui-tabs > ul > li.gui-active {
 }
 gui-tabs > ul > li.gui-active:after {
   bottom: -1px;
-  border-bottom: 1px solid #fdb882;
+  border-bottom: 1px solid #f6f6f6;
 }
 gui-tabs > gui-tab-container {
   height: calc(100% - 25px);
@@ -1093,20 +1093,20 @@ gui-progress-bar > span {
   color: #000;
 }
 application-window:before {
-  background: #fdb882;
+  background: #d9d9d9;
 }
 application-window application-window-content {
   background: #fff;
   padding-top: 0;
 }
 application-window application-window-content[data-focused="false"] {
-  border: 1px solid #fdb882;
+  border: 1px solid #f6f6f6;
 }
 application-window application-window-content[data-focused="true"] {
   border: 1px solid #dadada;
 }
 application-window application-window-content gui-menu-bar {
-  background: #fdb882;
+  background: #f6f6f6;
   color: #fff;
 }
 application-window application-window-content gui-menu-bar gui-menu-bar-entry {
@@ -1118,7 +1118,7 @@ application-window application-window-content gui-menu-bar .gui-active {
 }
 application-window application-window-content gui-menu-bar gui-menu {
   min-width: 100px;
-  background: #fdb882;
+  background: #f6f6f6;
 }
 application-window application-window-content gui-menu-bar gui-menu gui-menu-entry:hover {
   background-color: #00796b;
@@ -1196,7 +1196,7 @@ application-window application-window-top application-window-button-maximize:hov
 application-window application-window-top application-window-button-maximize:hover:after {
   width: 11px;
   height: 9px;
-  background: #fdb882;
+  background: #f6f6f6;
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-top-width: 2px;
   transform: translate(-50%, -50%);
@@ -1240,7 +1240,7 @@ application-splash > span {
   color: #fff;
 }
 gui-menu {
-  background: #fdb882;
+  background: #f6f6f6;
 }
 gui-menu gui-menu-entry:after {
   color: #5b5b5b;
@@ -1250,7 +1250,7 @@ gui-menu gui-menu-entry > label {
   color: #5b5b5b;
 }
 gui-menu gui-menu-entry:hover {
-  background-color: #f39349;
+  background-color: #fdb882;
 }
 gui-tabs > ul {
   height: 32px;
@@ -1262,10 +1262,10 @@ gui-tabs .gui-active:after {
   border: 1px solid #ffc107 !important;
 }
 gui-list-view gui-list-view-row.gui-active {
-  background-color: #f39349 !important;
+  background-color: #fdb882 !important;
 }
 gui-icon-view-entry.gui-active {
-  background-color: #f39349 !important;
+  background-color: #fdb882 !important;
 }
 gui-icon-view-entry.gui-active > div > span {
   background: rgba(0, 0, 0, 0) !important;
@@ -1341,11 +1341,11 @@ gui-select:after {
   top: 10px;
 }
 corewm-notification-entry:before {
-  background: #fdb882 !important;
+  background: #f6f6f6 !important;
 }
 corewm-panel:before {
-  background: #fdb882 !important;
-  background-color: #fdb882 !important;
+  background: #f6f6f6 !important;
+  background-color: #f6f6f6 !important;
 }
 corewm-panel .PanelItemWindowList .Button {
   opacity: 1 !important;
