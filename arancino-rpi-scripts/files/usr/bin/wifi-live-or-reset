@@ -1,6 +1,6 @@
 #!/bin/sh
 
-blink-start 200
+#blink-start 200
 
 IFACE="wlan0"
 SLEEP_TIME=2
