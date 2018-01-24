@@ -28,8 +28,8 @@ if [ -n "$timezone" ]; then
 fi
 
 if [ -n "$restapi" ]; then
-	/sbin/uci set arduino.@arduino[0].secure_rest_api="$restapi"
-    /sbin/uci commit arduino
+	  #/sbin/uci set arancino.@arancino[0].secure_rest_api="$restapi"
+    #/sbin/uci commit arancino
 fi
 
 

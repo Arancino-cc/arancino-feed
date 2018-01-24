@@ -25,6 +25,8 @@ define Package/arancino-rpi-scripts/conffiles
 /etc/config/dhcp
 /etc/config/network
 /etc/config/wireless
+/etc/config/smartme
+/etc/config/uhttpd
 endef
 
 define Build/Compile
@@ -48,6 +50,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_CONF) ./files/etc/config/network $(1)/etc/config/
 	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config/
 	$(INSTALL_CONF) ./files/etc/config/smartme $(1)/etc/config
+	$(INSTALL_CONF) ./files/etc/config/uhttpd $(1)/etc/config
 
 	# /usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/smartme-wifi-connect $(1)/usr/bin
@@ -62,6 +65,23 @@ define Package/arancino-rpi-scripts/install
 
 	$(CP) ./files/osjs/* $(1)/osjs
 	$(CP) ./files/usr/lib/* $(1)/usr/lib
+endef
+
+define Package/arancino-rpi-scripts/postinst
+#!/bin/sh
+if [ -e /etc/config/uhttpd ]
+then
+	# make the webserver ponting to /osjs instead of /www
+	sed -i -e 's/www/osjs\/dist/g' /etc/config/uhttpd
+
+	# Linking LUci
+	#mkdir -p /osjs/dist/luci
+	ln -sf /www/index.html /osjs/dist/luci/index.html
+	ln -sf /www/luci-static /osjs/dist/luci-static
+	ln -sf /www/cgi-bin/luci /osjs/dist/cgi-bin/luci
+
+fi
+exit 0
 endef
 
 $(eval $(call BuildPackage,arancino-rpi-scripts))

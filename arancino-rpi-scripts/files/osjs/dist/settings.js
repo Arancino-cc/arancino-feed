@@ -6,10 +6,10 @@
     return function() {
       if ( !_cache ) {
         _cache = {
-    "Version": "2.0.3-arduino-os",
+    "Version": "1.0.0-arancino-os",
     "Connection": {
         "Type": "http",
-        "Handler": "arduino",
+        "Handler": "arancino",
         "RootURI": "",
         "APIURI": "/cgi-bin/osjs-api",
         "FSURI": "/cgi-bin/osjs-fs",
@@ -27,7 +27,7 @@
     "ShowQuitWarning": true,
     "ReloadOnShutdown": false,
     "AutoStart": [
-        "ArduinoService"
+        "ArancinoService"
     ],
     "Styles": [
         {
@@ -136,8 +136,8 @@
         "args": {
             "defaults": {
                 "theme": "material",
-                "icon": "arduino.png",
-                "wallpaper": "osjs:///themes/wallpapers/arduino-infinite-boards.jpg",
+                "icon": "arancino.png",
+                "wallpaper": "osjs:///themes/wallpapers/wallpaper-arancino-os.jpg",
                 "backgroundColor": "#ebebeb",
                 "icons": "default",
                 "sounds": "default",
