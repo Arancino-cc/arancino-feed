@@ -64,4 +64,21 @@ define Package/arancino-rpi-scripts/install
 	$(CP) ./files/usr/lib/* $(1)/usr/lib
 endef
 
+define Package/arancino-rpi-scripts/postinst
+#!/bin/sh
+if [ -e /etc/config/uhttpd ]
+then
+	# make the webserver ponting to /osjs instead of /www
+	sed -i -e 's/www/osjs\/dist/g' /etc/config/uhttpd /etc/config/uhttpd
+
+	# Linking LUci
+	mkdir -p /osjs/dist/luci
+	ln -sf /www/index.html /osjs/dist/luci/index.html
+	ln -sf /www/luci-static /osjs/dist/luci-static
+	ln -sf /www/cgi-bin/luci /osjs/dist/cgi-bin/luci
+
+fi
+exit 0
+endef
+
 $(eval $(call BuildPackage,arancino-rpi-scripts))
