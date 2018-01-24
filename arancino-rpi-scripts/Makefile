@@ -72,7 +72,7 @@ define Package/arancino-rpi-scripts/postinst
 if [ -e /etc/config/uhttpd ]
 then
 	# make the webserver ponting to /osjs instead of /www
-	sed -i -e 's/www/osjs\/dist/g' /etc/config/uhttpd /etc/config/uhttpd
+	sed -i -e 's/www/osjs\/dist/g' /etc/config/uhttpd
 
 	# Linking LUci
 	#mkdir -p /osjs/dist/luci
