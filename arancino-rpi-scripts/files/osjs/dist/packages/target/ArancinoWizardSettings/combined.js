@@ -157,13 +157,13 @@
                         toggleVisibility();
                     }
                     break;
-                case 3: // 3->4 - Rest Api -> Save and Restart
-                    if(checkRestApiField()) {
-                        step++;
-                        toggleVisibility();
-                    }
-                    break;
-                case 4: // 4->// - Save and Restart -> APPLY CHANGES
+                // case 3: // 3->4 - Rest Api -> Save and Restart
+                //     if(checkRestApiField()) {
+                //         step++;
+                //         toggleVisibility();
+                //     }
+                //     break;
+                case 3: // 4->// - Save and Restart -> APPLY CHANGES
                     //step++;
                     //toggleVisibility();
                     saveAndRestart();
@@ -485,7 +485,7 @@
                         //});
                         clearInterval(intervalReboot);
                     }
-                }, 10 * 1000);
+                }, 10 * 200);
             });
         });
         }
