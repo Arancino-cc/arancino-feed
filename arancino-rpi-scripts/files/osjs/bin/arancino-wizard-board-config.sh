@@ -27,10 +27,10 @@ if [ -n "$timezone" ]; then
 	/sbin/uci commit system
 fi
 
-if [ -n "$restapi" ]; then
-	  /sbin/uci set arancino.@arancino[0].secure_rest_api="$restapi"
-    /sbin/uci commit arancino
-fi
+# if [ -n "$restapi" ]; then
+# 	  /sbin/uci set smartme.@smartme[0].secure_rest_api="$restapi"
+#     /sbin/uci commit smartme
+# fi
 
 
 #
