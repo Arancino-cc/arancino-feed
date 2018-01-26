@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -75,7 +75,7 @@ then
 	sed -i -e 's/www/osjs\/dist/g' /etc/config/uhttpd
 
 	# Linking LUci
-	#mkdir -p /osjs/dist/luci
+	mkdir -p /osjs/dist/luci
 	ln -sf /www/index.html /osjs/dist/luci/index.html
 	ln -sf /www/luci-static /osjs/dist/luci-static
 	ln -sf /www/cgi-bin/luci /osjs/dist/cgi-bin/luci
