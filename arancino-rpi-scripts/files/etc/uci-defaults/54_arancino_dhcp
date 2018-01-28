@@ -1,0 +1,15 @@
+#!/bin/sh
+
+[ "$(uci get system.@system[-1].arancino_firstboot)" = "1" ] && return 0
+. /lib/functions.sh
+
+config_load dhcp
+
+set_dhcp_interface() {
+	uci add_list dhcp.interface='lo,wlan0'
+	uci commit dhcp
+	exit 0
+}
+
+set_dhcp_interface
+exit 0

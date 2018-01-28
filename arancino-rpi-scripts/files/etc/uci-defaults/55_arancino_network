@@ -1,0 +1,17 @@
+#!/bin/sh
+
+[ "$(uci get system.@system[-1].arancino_firstboot)" = "1" ] && return 0
+. /lib/functions.sh
+
+config_load network
+
+set_network_interface() {
+	uci set network.wan.ifname='eth0'
+	uci set network.wan.proto='dhcp'
+	uci set network.wan.metric='10'
+	uci commit network
+	exit 0
+}
+
+set_network_interface
+exit 0

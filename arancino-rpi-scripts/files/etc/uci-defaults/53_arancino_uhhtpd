@@ -1,0 +1,16 @@
+#!/bin/sh
+
+[ "$(uci get system.@system[-1].arancino_firstboot)" = "1" ] && return 0
+. /lib/functions.sh
+
+config_load uhttpd
+
+set_listen_http() {
+	uci set uhttpd.main.listen_http='0.0.0.0:80'
+	uci set uhttpd.main.listen_https='0.0.0.0:443'
+	uci commit uhttpd
+	exit 0
+}
+
+set_listen_http
+exit 0
