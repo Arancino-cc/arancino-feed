@@ -17,7 +17,6 @@ define Package/arancino-rpi-scripts
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Custom Arancino RPi support package
-  DEPENDS:=+komd-loop
   DEFAULT:=y
 endef
 
