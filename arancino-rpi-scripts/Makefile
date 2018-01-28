@@ -15,17 +15,9 @@ include $(INCLUDE_DIR)/package.mk
 
 define Package/arancino-rpi-scripts
   SECTION:=utils
-  CATEGORY:=Base system
+  CATEGORY:=Utilities
   TITLE:=Custom Arancino RPi support package
-  DEPENDS:=@CONFIG_TARGET_brcm2708_bcm2710_DEVICE_rpi \
-   +kmod-loop +wireless-tools +shellinabox \
-   +kmod-usb-net +kmod-usb-net-rndis +kmod-usb-net-cdc-ether \
-   +usbutils +udev +kmod-usb-net-asix +kmod-usb-net-asix-ax88179 +kmod-libphy \
-   +uci-ssl-openssl +luci-app-openvpn +openvpn +libiwinfo +libiwinfo-lua +liblua \
-   +libopenssl +libpam +librt +libubus-lua +libuci-lua +lua +lua-coxpcall +lua-wsapi-base \
-   +lua-wsapi-xavante +lua-xavante +luafilesystem +luci +luci-app-firewall +luci-base \
-   +luci-lib-ip +luci-lib-jsonc +luci-lib-nixio +luci-mod-admin-full +luci-proto-ipv6 \
-   +luci-proto-ppp +luci-theme-bootstrap +openssl-util +rpcd +uhttpd +uhttpd-mod-ubus +zlib
+  DEPENDS:=+komd-loop
   DEFAULT:=y
 endef
 
@@ -78,13 +70,6 @@ endef
 
 define Package/arancino-rpi-scripts/postinst
 #!/bin/sh
-$(CP) $(1)/etc/config/firewall /etc/config/firewall.bak
-$(CP) $(1)/etc/config/dhcp /etc/config/dhcp.bak
-$(CP) $(1)/etc/config/uhttpd /etc/config/uhttpd.bak
-$(CP) $(1)/etc/config/firewall.my /etc/config/firewall
-$(CP) $(1)/etc/config/dhcp.my /etc/config/dhcp
-$(CP) $(1)/etc/config/uhttpd.my /etc/config/uhttpd
-
 if [ -e /etc/config/uhttpd ]
 then
 	# make the webserver ponting to /osjs instead of /www
