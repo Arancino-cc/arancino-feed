@@ -6,6 +6,7 @@
 config_load network
 
 set_network_interface() {
+	uci set network.wan=interface
 	uci set network.wan.ifname='eth0'
 	uci set network.wan.proto='dhcp'
 	uci set network.wan.metric='10'

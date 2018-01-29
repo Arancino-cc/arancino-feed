@@ -6,7 +6,7 @@
 config_load dhcp
 
 set_dhcp_interface() {
-	uci add_list dhcp.interface='lo,wlan0'
+	uci set dhcp.interface='lo,wlan0'
 	uci commit dhcp
 	exit 0
 }
