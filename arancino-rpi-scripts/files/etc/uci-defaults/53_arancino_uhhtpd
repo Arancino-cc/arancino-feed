@@ -8,6 +8,8 @@ config_load uhttpd
 set_listen_http() {
 	uci set uhttpd.main.listen_http='0.0.0.0:80'
 	uci set uhttpd.main.listen_https='0.0.0.0:443'
+	uci set uhttpd.main.rfc1918_filter='0'
+	uci set uhttpd.main.redirect_https='0'
 	uci commit uhttpd
 	exit 0
 }

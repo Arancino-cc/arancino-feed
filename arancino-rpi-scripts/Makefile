@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=6
+PKG_RELEASE:=7
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -24,12 +24,6 @@ define Package/arancino-rpi-scripts/conffiles
 /etc/config/wireless
 /etc/config/smartme
 endef
-
-# /etc/config/network
-# /etc/config/firewall
-# /etc/config/dhcp
-# /etc/config/uhttpd
-
 
 define Build/Compile
 	# NOOP
@@ -79,6 +73,11 @@ then
 	ln -sf /www/index.html /osjs/dist/luci/index.html
 	ln -sf /www/luci-static /osjs/dist/luci-static
 	ln -sf /www/cgi-bin/luci /osjs/dist/cgi-bin/luci
+fi
+if [ -e /etc/shadow ]
+then
+	# set the new default password
+	sed -i 's|^root::|root:$1$VmdTXWeP$c6u7hCp8MmragUglVncTI/:|' /etc/shadow
 fi
 exit 0
 endef
