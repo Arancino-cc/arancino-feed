@@ -74,10 +74,10 @@ then
 	ln -sf /www/luci-static /osjs/dist/luci-static
 	ln -sf /www/cgi-bin/luci /osjs/dist/cgi-bin/luci
 fi
-if [ -e /etc/shadow ]
+if [ -e $${IPKG_INSTROOT}/etc/shadow ]
 then
 	# set the new default password
-	sed -i 's|^root::|root:$1$VmdTXWeP$c6u7hCp8MmragUglVncTI/:|' /etc/shadow
+	sed -i 's|^root::|root:$1$VmdTXWeP$c6u7hCp8MmragUglVncTI/:|' $${IPKG_INSTROOT}/etc/shadow
 fi
 exit 0
 endef
