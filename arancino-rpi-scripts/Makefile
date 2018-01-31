@@ -63,21 +63,21 @@ endef
 
 define Package/arancino-rpi-scripts/postinst
 #!/bin/sh
-if [ -e /etc/config/uhttpd ]
+if [ -e $${IPKG_INSTROOT}/etc/config/uhttpd ]
 then
 	# make the webserver ponting to /osjs instead of /www
-	sed -i -e 's/www/osjs\/dist/g' /etc/config/uhttpd
+	sed -i -e 's/www/osjs\/dist/g' $${IPKG_INSTROOT}/etc/config/uhttpd
 
 	# Linking LUci
-	mkdir -p /osjs/dist/luci
-	ln -sf /www/index.html /osjs/dist/luci/index.html
-	ln -sf /www/luci-static /osjs/dist/luci-static
-	ln -sf /www/cgi-bin/luci /osjs/dist/cgi-bin/luci
+	mkdir -p $${IPKG_INSTROOT}//osjs/dist/luci
+	ln -sf /www/index.html $${IPKG_INSTROOT}//osjs/dist/luci/index.html
+	ln -sf /www/luci-static $${IPKG_INSTROOT}//osjs/dist/luci-static
+	ln -sf /www/cgi-bin/luci $${IPKG_INSTROOT}//osjs/dist/cgi-bin/luci
 fi
 if [ -e $${IPKG_INSTROOT}/etc/shadow ]
 then
 	# set the new default password
-	sed -i 's|^root::|root:$1$VmdTXWeP$c6u7hCp8MmragUglVncTI/:|' $${IPKG_INSTROOT}/etc/shadow
+	sed -i 's|^root::|root:\$$1\$$VmdTXWeP\$$c6u7hCp8MmragUglVncTI\/:|' $${IPKG_INSTROOT}/etc/shadow
 fi
 exit 0
 endef
