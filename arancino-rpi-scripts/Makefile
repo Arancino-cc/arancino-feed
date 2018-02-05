@@ -79,6 +79,12 @@ then
 	# set the new default password
 	sed -i 's|^root::|root:\$$1\$$VmdTXWeP\$$c6u7hCp8MmragUglVncTI\/:|' $${IPKG_INSTROOT}/etc/shadow
 fi
+if [ -e $${IPKG_INSTROOT}/boot/config.txt ]
+then
+        # enable spi and configure can interface
+	@echo dtoverlay=spi0-cs,cs0_pin=8 >> $${IPKG_INSTROOT}/boot/config.txt
+	@echo dtoverlay=mcp2515-can0,interrupt=6 >> $${IPKG_INSTROOT}/boot/config.txt
+fi
 exit 0
 endef
 
