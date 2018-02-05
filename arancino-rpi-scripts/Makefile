@@ -55,6 +55,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
 	#$(INSTALL_BIN) ./files/etc/init.d/generate_new_gpg_key $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/handle_wifi_reset $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/etc/init.d/can-setup $(1)/etc/init.d
 
 	$(CP) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
 	$(CP) ./files/osjs/* $(1)/osjs
