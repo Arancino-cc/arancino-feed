@@ -9,7 +9,7 @@ echo out > /sys/class/gpio/gpio5/direction
 echo 1 > /sys/class/gpio/gpio5/value
 
 # configure and enable can0 interface
-ip link set can0 type can bitrate 125000 triple-sampling on
+/usr/sbin/ip link set can0 type can bitrate 125000 triple-sampling on
 /sbin/ifconfig can0 up
 
 exit 0
