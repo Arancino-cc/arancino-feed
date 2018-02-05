@@ -39,7 +39,7 @@ define Package/arancino-rpi-scripts/install
 	#$(INSTALL_DIR) $(1)/etc/smartme
 
 	# /etc
-	$(INSTALL_DATA) ./files/etc/rc.local $(1)/etc
+	#$(INSTALL_DATA) ./files/etc/rc.local $(1)/etc
 
 	# /etc/config DIR
 	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config/wireless
