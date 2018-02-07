@@ -1,61 +1,69 @@
 #
-# Copyright (C) 2006 OpenWrt.org
+# Copyright (C) 2006-2009 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
 #
-# $Id$
+
 include $(TOPDIR)/rules.mk
+
 PKG_NAME:=libnids
 PKG_VERSION:=1.18
 PKG_RELEASE:=1
+
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://sourceforge.net/projects/libnids/files/libnids/1.18/
+PKG_SOURCE_URL:=@SF/libnids
+#PKG_MD5SUM:=72d37c79c85615ffe158aa524d649610
 PKG_MD5SUM:=9ee6dcdfac97bae6fe611aa27d2594a5
-PKG_CAT:=zcat
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
-PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/ipkg-install
+
 include $(INCLUDE_DIR)/package.mk
+
 define Package/libnids
   SECTION:=libs
   CATEGORY:=Libraries
-  DEPENDS:=+libnet0
+  DEPENDS:=+libnet-1.2.x +libpcap
   TITLE:=A network intrusion detection library
-  DESCRIPTION:=\
-        An implementation of an E-component of Network Intrusion Detection \\\
-        System.
-  URL:=https://sourceforge.net/projects/libnids/files/libnids/1.18/
+  URL:=http://libnids.sourceforge.net/
 endef
+
+define Package/libnids/description
+	An implementation of an E-component of Network Intrusion Detection
+	System.
+endef
+
 define Build/Configure
-        $(call Build/Configure/Default, \
-                --enable-shared \
-                --enable-static \
-                --with-libnet="$(STAGING_DIR)/usr/lib/libnet-1.0.x" \
-                --with-libpcap="$(STAGING_DIR)/usr" \
-                , \
-                CFLAGS="$$$$CFLAGS $$$$CPPFLAGS" \
-        )
+	$(call Build/Configure/Default, \
+		--enable-shared \
+		--enable-static \
+		--with-libnet="$(STAGING_DIR)/usr/lib/libnet-1.2.x" \
+		--with-libpcap="$(STAGING_DIR)/usr" \
+		--disable-libglib \
+		, \
+		CFLAGS="$$$$CFLAGS $$$$CPPFLAGS" \
+	)
 endef
+
+TARGET_CFLAGS += $(FPIC)
+
 define Build/Compile
-        $(MAKE) -C $(PKG_BUILD_DIR) \
-                LNETLIB="-L$(STAGING_DIR)/usr/lib/libnet-1.0.x/lib -lnet" \
-                PCAPLIB="-L$(STAGING_DIR)/usr/lib -lpcap" \
-                install_prefix="$(PKG_INSTALL_DIR)" \
-                all install
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+		LNETLIB="-L$(STAGING_DIR)/usr/lib/libnet-1.2.x/lib -lnet" \
+		PCAPLIB="$(TARGET_LDFLAGS) -lpcap" \
+		install_prefix="$(PKG_INSTALL_DIR)" \
+		all install
 endef
+
 define Build/InstallDev
-        mkdir -p $(STAGING_DIR)/usr/include
-        $(CP) $(PKG_INSTALL_DIR)/usr/include/nids.h $(STAGING_DIR)/usr/include/
-        mkdir -p $(STAGING_DIR)/usr/lib
-        $(CP) $(PKG_INSTALL_DIR)/usr/lib/libnids.{a,so*} $(STAGING_DIR)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/include
+	$(CP) $(PKG_INSTALL_DIR)/usr/include/nids.h $(1)/usr/include/
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libnids.{a,so*} $(1)/usr/lib/
 endef
-define Build/UninstallDev
-        rm -rf \
-                $(STAGING_DIR)/usr/include/nids.h \
-                $(STAGING_DIR)/usr/lib/libnids.{a,so*}
-endef
+
 define Package/libnids/install
-        $(INSTALL_DIR) $(1)/usr/lib
-        $(CP) $(PKG_INSTALL_DIR)/usr/lib/libnids.so.* $(1)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libnids.so.* $(1)/usr/lib/
 endef
+
 $(eval $(call BuildPackage,libnids))
+
