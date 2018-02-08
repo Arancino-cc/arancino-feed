@@ -54,6 +54,19 @@ define Package/node/config
 	endmenu
 endef
 
+define Package/node-npm
+	SECTION:=lang
+	CATEGORY:=Languages
+	SUBMENU:=Node.js
+	TITLE:=NPM stands for Node Package Manager
+	URL:=http://npmjs.com/
+	DEPENDS:=+node
+endef
+
+define Package/node-npm/description 
+	NPM is the package manager for Node.js
+endef
+
 CPUHOST:=$(subst x86_64-linux-gnu,x64,$(subst x86_64-pc-linux-gnu,x64,$(subst i686-linux-gnu,x86,$(subst i686-pc-linux-gnu,x86,$(GNU_HOST_NAME)))))
 
 NODEJS:=node-$(PKG_VERSION)-linux-$(CPUHOST).tar.xz
@@ -153,4 +166,16 @@ define Package/node/install
 	$(LN) ../lib/node_modules/npm/bin/npm-cli.js $(1)/usr/bin/npm
 endef
 
+define Package/node-npm/install
+	$(INSTALL_DIR) $(1)/usr/lib/node_modules
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/* $(1)/usr/lib/node_modules/
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(LN) ../lib/node_modules/npm/bin/npm-cli.js $(1)/usr/bin/npm
+ifneq ($(filter y,$(CONFIG_NODEJS_8) $(CONFIG_NODEJS_9)),)
+	$(LN) ../lib/node_modules/npm/bin/npx-cli.js $(1)/usr/bin/npx
+endif
+endef
+
+
 $(eval $(call BuildPackage,node))
+$(eval $(call BuildPackage,node-npm))
