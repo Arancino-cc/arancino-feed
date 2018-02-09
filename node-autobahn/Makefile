@@ -46,7 +46,7 @@ define Build/Compile
 	npm_config_cache=$(TMP_DIR)/npm-cache \
 	npm_config_tmp=$(TMP_DIR)/npm-tmp \
 	PREFIX="$(PKG_INSTALL_DIR)/usr/" \
-	npm install --build-from-source --target_arch=$(NODEJS_CPU) -g $(DL_DIR)/$(PKG_SOURCE)
+	$(STAGING_DIR_HOSTPKG)/bin/npm install --build-from-source --target_arch=$(NODEJS_CPU) -g $(DL_DIR)/$(PKG_SOURCE)
 	rm -rf $(TMP_DIR)/npm-tmp
 	rm -rf $(TMP_DIR)/npm-cache
 endef
