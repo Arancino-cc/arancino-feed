@@ -54,8 +54,8 @@ define Build/Compile
 endef
 
 define Package/node-serialport/install
-	$(INSTALL_DIR) $(1)/usr/lib/node
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/* $(1)/usr/lib/node
+	$(INSTALL_DIR) $(1)/usr/lib/node_modules
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/$(PKG_NPM_NAME) $(1)/usr/lib/node_modules
 
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(LN) ../lib/node/serialport/bin/list.js $(1)/usr/bin/serialport-list
