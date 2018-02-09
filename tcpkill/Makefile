@@ -16,7 +16,6 @@ PKG_SOURCE_PROTO:= git
 PKG_REVISION:=v1.0
 PKG_SOURCE_VERSION:=$(PKG_VERSION)
 
-PKG_SOURCEi_SUBDIR:=$(PKG_NAME)-v$(PKG_VERSION)
 PKG_SOURCE_URL:=https://github.com/Arancino-cc/tcpkill.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_REVISION).tar.gz
 #PKG_MD5SUM:=ec53cd0a702240c48c3b65ae70fd3f40
@@ -33,7 +32,7 @@ define Package/tcpkill
   URL:=http://www.monkey.org/~dugsong/dsniff/
 endef
 
-define Package/dsniff/description
+define Package/tcpkill/description
 	A collection of tools for network auditing and penetration testing.
 endef
 
