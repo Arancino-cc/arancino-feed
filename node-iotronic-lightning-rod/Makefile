@@ -12,7 +12,7 @@ PKG_RELEASE:=1
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/MDSLab/$(PKG_NPM_NAME).git
+PKG_SOURCE_URL:=https://github.com/MDSLab/s4t-lightning-rod.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=2e32eea18b6daf5e8624389ea8366b0a5b36ad8a
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
@@ -58,4 +58,4 @@ define Package/node-iotronic-lightning-rod/install
 	$(1)/usr/lib/node_modules
 endef
 
-$(eval $(call BuildPackage,node-wstun))
+$(eval $(call BuildPackage,node-iotronic-lightning-rod))
