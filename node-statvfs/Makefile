@@ -6,12 +6,16 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=statvfs
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.1.0
-PKG_RELEASE:=12
+PKG_VERSION:=3.0.0
+PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
-PKG_SOURCE_URL:=http://registry.npmjs.org/$(PKG_NPM_NAME)/-/
-PKG_HASH:=a93dd601ce864c4554deb32713f6c11100808b2cd93f77e66d8038a413542d6f
+PKG_SOURCE_PROTO:=git
+#PKG_SOURCE_URL:=https://github.com/MDSLab/s4t-lightning-rod.git
+PKG_SOURCE_URL:=https://github.com/PlayNetwork/node-statvfs.git
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=9e81580a8eec06a19eee5f29e6597175a622ba09
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+
 
 PKG_BUILD_DEPENDS:=node
 PKG_NODE_VERSION:=6.11.4
@@ -29,7 +33,7 @@ define Package/node-statvfs
   CATEGORY:=Languages
   TITLE:=node binding to POSIX statvfs (file system information)
   URL:=https://www.npmjs.org/package/statvfs
-  DEPENDS:=+node +node8
+  DEPENDS:=+node
 endef
 
 define Package/node-statvfs/description
