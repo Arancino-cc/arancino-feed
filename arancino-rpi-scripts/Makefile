@@ -17,7 +17,7 @@ define Package/arancino-rpi-scripts
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Custom Arancino RPi support package
-  DEFAULT:=y
+  DEFAULT:=m
 endef
 
 define Package/arancino-rpi-scripts/conffiles

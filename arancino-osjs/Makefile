@@ -17,7 +17,7 @@ define Package/arancino-osjs
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Custom Arancino Osjs support package
-  DEFAULT:=y
+  DEFAULT:=m
 endef
 
 define Build/Compile

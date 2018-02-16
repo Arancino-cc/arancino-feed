@@ -17,7 +17,7 @@ define Package/arancino-linkit-scripts
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Custom Arancino Linkit support package
-  DEFAULT:=y
+  DEFAULT:=m
 endef
 
 define Package/arancino-linkit-scripts/conffiles
