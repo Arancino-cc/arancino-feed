@@ -8,14 +8,14 @@ start() {
 	#boardname=$(awk '/machine/ {print tolower($4)}' /proc/cpuinfo)
 
 	MODE=`/sbin/uci get wireless.@wifi-iface[0].mode`
-	#SSID=`/sbin/uci get wireless.@wifi-iface[0].ssid`
+	SSID=`/sbin/uci get wireless.@wifi-iface[0].ssid`
 
-	#SSID_PREFIX=`/sbin/uci get wireless.@wifi-iface[0].ssid | sed s/-.*//`
+	SSID_PREFIX=`/sbin/uci get wireless.@wifi-iface[0].ssid | sed s/-.*//`
 
-	#if [ "$SSID_PREFIX" != "Arduino" -a "$SSID_PREFIX" != "Linino" -a "$SSID_PREFIX" != "OpenWrt" ]
-	#then
-	#	return
-	#fi
+	if [ "$SSID_PREFIX" != "SmartME" ]
+	then
+		return
+	fi
 
 	PREFIX=$(awk '/machine/ {print $3}' /proc/cpuinfo)
 

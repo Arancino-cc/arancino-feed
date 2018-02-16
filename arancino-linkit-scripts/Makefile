@@ -62,6 +62,10 @@ define Package/arancino-linkit-scripts/postinst
 #!/bin/sh
 if [ -e $${IPKG_INSTROOT}/etc/shadow ]
 then
+	sed -i -e "s/LinkIt.*/SmartME\'/g" $${IPKG_INSTROOT}/etc/config/wireless
+fi
+if [ -e $${IPKG_INSTROOT}/etc/shadow ]
+then
 	# set the new default password
 	sed -i 's|^root::|root:\$$1\$$VmdTXWeP\$$c6u7hCp8MmragUglVncTI\/:|' $${IPKG_INSTROOT}/etc/shadow
 fi
