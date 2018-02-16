@@ -7,20 +7,20 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=arancino-rpi-scripts
+PKG_NAME:=arancino-linkit-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=11
+PKG_RELEASE:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/arancino-rpi-scripts
+define Package/arancino-linkit-scripts
   SECTION:=utils
   CATEGORY:=Utilities
-  TITLE:=Custom Arancino RPi support package
+  TITLE:=Custom Arancino Linkit support package
   DEFAULT:=y
 endef
 
-define Package/arancino-rpi-scripts/conffiles
+define Package/arancino-linkit-scripts/conffiles
 /etc/config/wireless
 /etc/config/smartme
 endef
@@ -29,10 +29,8 @@ define Build/Compile
 	# NOOP
 endef
 
-define Package/arancino-rpi-scripts/install
+define Package/arancino-linkit-scripts/install
 	$(INSTALL_DIR) $(1)/usr/bin/
-	$(INSTALL_DIR) $(1)/usr/lib/
-	$(INSTALL_DIR) $(1)/osjs
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/etc/init.d
@@ -58,23 +56,10 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/etc/init.d/can-setup $(1)/etc/init.d
 
 	$(CP) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
-	$(CP) ./files/osjs/* $(1)/osjs
-	$(CP) ./files/usr/lib/* $(1)/usr/lib
 endef
 
-define Package/arancino-rpi-scripts/postinst
+define Package/arancino-linkit-scripts/postinst
 #!/bin/sh
-if [ -e $${IPKG_INSTROOT}/etc/config/uhttpd ]
-then
-	# make the webserver ponting to /osjs instead of /www
-	sed -i -e 's/www/osjs\/dist/g' $${IPKG_INSTROOT}/etc/config/uhttpd
-
-	# Linking LUci
-	mkdir -p $${IPKG_INSTROOT}//osjs/dist/luci
-	ln -sf /www/index.html $${IPKG_INSTROOT}//osjs/dist/luci/index.html
-	ln -sf /www/luci-static $${IPKG_INSTROOT}//osjs/dist/luci-static
-	ln -sf /www/cgi-bin/luci $${IPKG_INSTROOT}//osjs/dist/cgi-bin/luci
-fi
 if [ -e $${IPKG_INSTROOT}/etc/shadow ]
 then
 	# set the new default password
@@ -89,4 +74,4 @@ fi
 exit 0
 endef
 
-$(eval $(call BuildPackage,arancino-rpi-scripts))
+$(eval $(call BuildPackage,arancino-linkit-scripts))
