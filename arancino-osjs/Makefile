@@ -24,7 +24,7 @@ define Build/Compile
 	# NOOP
 endef
 
-define Package/arancino-osjs-scripts/install
+define Package/arancino-osjs/install
 	$(INSTALL_DIR) $(1)/usr/lib/
 	$(INSTALL_DIR) $(1)/osjs
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
@@ -34,7 +34,7 @@ define Package/arancino-osjs-scripts/install
 	$(CP) ./files/usr/lib/* $(1)/usr/lib
 endef
 
-define Package/arancino-osjs-scripts/postinst
+define Package/arancino-osjs/postinst
 #!/bin/sh
 if [ -e $${IPKG_INSTROOT}/etc/config/uhttpd ]
 then
