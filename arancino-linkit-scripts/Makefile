@@ -21,7 +21,6 @@ define Package/arancino-linkit-scripts
 endef
 
 define Package/arancino-linkit-scripts/conffiles
-/etc/config/wireless
 /etc/config/smartme
 endef
 
@@ -40,7 +39,6 @@ define Package/arancino-linkit-scripts/install
 	#$(INSTALL_DATA) ./files/etc/rc.local $(1)/etc
 
 	# /etc/config DIR
-	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config/wireless
 	$(INSTALL_CONF) ./files/etc/config/smartme $(1)/etc/config
 
 	# /usr/bin
@@ -60,7 +58,7 @@ endef
 
 define Package/arancino-linkit-scripts/postinst
 #!/bin/sh
-if [ -e $${IPKG_INSTROOT}/etc/shadow ]
+if [ -e $${IPKG_INSTROOT}/etc/config/wireless ]
 then
 	sed -i -e "s/LinkIt.*/SmartME\'/g" $${IPKG_INSTROOT}/etc/config/wireless
 fi
