@@ -8,14 +8,14 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.0.4
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
 #PKG_SOURCE_URL:=https://github.com/MDSLab/s4t-lightning-rod.git
 PKG_SOURCE_URL:=https://github.com/Arancino-cc/s4t-lightning-rod.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=d457dc7be2659702f277415d45ccf059705e8bc8
+PKG_SOURCE_VERSION:=a13126122645340fb944b64e6a7b3b0fb3849695
 #PKG_SOURCE_VERSION:=2e32eea18b6daf5e8624389ea8366b0a5b36ad8a
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
@@ -58,9 +58,11 @@ define Build/Compile
 endef
 
 define Package/node-iotronic-lightning-rod/install
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/usr/lib/node_modules/$(PKG_ORG)
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME) \
 	$(1)/usr/lib/node_modules/$(PKG_ORG)
+	$(CP) ./files/uci-defaults/61_config $(1)/etc/uci-defaults
 endef
 
 $(eval $(call BuildPackage,node-iotronic-lightning-rod))
