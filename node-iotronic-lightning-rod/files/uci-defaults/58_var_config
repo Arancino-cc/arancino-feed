@@ -1,0 +1,17 @@
+#!/bin/sh
+
+[ "$(uci get system.@system[-1].arancino_firstboot)" = "1" ] && return 0
+
+NODE_IOTRONIC_INSTALL='/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino'
+
+if [ -e ${NODE_IOTRONIC_INSTALL}/moveVar_LR_arancino.sh ]
+	then
+	 ${NODE_IOTRONIC_INSTALL}/moveVar_LR_arancino.sh
+fi 
+
+if [ -e ${NODE_IOTRONIC_INSTALL}/install_LR_arancino.sh ]
+	then
+	 ${NODE_IOTRONIC_INSTALL}/install_LR_arancino.sh
+fi 
+
+exit 0
