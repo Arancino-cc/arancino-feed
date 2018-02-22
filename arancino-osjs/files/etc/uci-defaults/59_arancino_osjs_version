@@ -1,0 +1,5 @@
+#!/bin/sh
+
+uci set system.@system[0].osjs=v0.0.1
+uci set system.@system[0].arancino_osjs_firstboot=1
+uci commit system
