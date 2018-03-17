@@ -13,7 +13,7 @@ start() {
 	echo 1 > /sys/class/gpio/gpio5/value
 
 	# configure and enable can0 interface
-	$IPC link set $CANIF type can bitrate 125000 triple-sampling on
+	$IPC link set $CANIF type can bitrate 250000 triple-sampling on
 	$IFCONFIG $CANIF up
 }
 
