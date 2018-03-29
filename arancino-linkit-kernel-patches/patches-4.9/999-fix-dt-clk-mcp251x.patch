@@ -1,0 +1,13 @@
+Index: linux-4.9.82/drivers/net/can/spi/mcp251x.c
+===================================================================
+--- linux-4.9.82.orig/drivers/net/can/spi/mcp251x.c
++++ linux-4.9.82/drivers/net/can/spi/mcp251x.c
+@@ -1039,7 +1039,7 @@ static int mcp251x_can_probe(struct spi_
+ 		if (pdata)
+ 			freq = pdata->oscillator_frequency;
+ 		else
+-			return PTR_ERR(clk);
++			freq = 10000000; //return PTR_ERR(clk);
+ 	} else {
+ 		freq = clk_get_rate(clk);
+ 	}
