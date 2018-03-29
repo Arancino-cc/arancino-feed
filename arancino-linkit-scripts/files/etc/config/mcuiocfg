@@ -1,0 +1,3 @@
+# MCUIO configuration file
+
+BAUDRATE=230400
