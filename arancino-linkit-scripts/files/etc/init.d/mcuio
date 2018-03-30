@@ -4,19 +4,20 @@
 START=11
 STOP=11
 
-source /etc/config/mcuiocfg
-
 baudcmd="\xaa"
 
 start() {
+	source /etc/config/mcuiocfg
 	# Reset mcu
 	#mcu-reset
 	#sleep 2
 	# Init serial port at 250kbps (default for bathos-mcuio.hex at boot)
-	stty 230400 -echo raw < /dev/ttyATH0
+	stty 230400 -echo raw < /dev/ttyS0
 
 	#set default value for baudrate
-	if [ -z $BAUDRATE ]; then BAUDRATE=230400
+	if [ -z $BAUDRATE ]; then 
+		BAUDRATE=230400 
+	fi
 
 	if [ $BAUDRATE -eq 230400 ]; then
 		baudcmd="\xaa"
@@ -24,11 +25,11 @@ start() {
 		baudcmd="\xab"
 	fi
 	# Make MCU to switch to mcuio mode
-	echo -n -e $baudcmd > /dev/ttyATH0
+	echo -n -e $baudcmd > /dev/ttyS0
 	# Set serial port baudrate
-	stty $BAUDRATE -echo raw < /dev/ttyATH0
-	# Start ldattach to set line discipline
-	ldattach -s $BAUDRATE 29 /dev/ttyATH0
+	stty $BAUDRATE -echo raw < /dev/ttyS0
+	# Start ldattach to set line discipline N_MCUIO=29
+	ldattach 29 /dev/ttyS0
 }
 
 stop() {
