@@ -40,8 +40,8 @@ define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
 		install_prefix="$(PKG_INSTALL_DIR)" \
-		CFLAGS+="-Os -pipe -mcpu=cortex-a53 -mfpu=neon-vfpv4 -fno-caller-saves -fno-plt -fhonour-copts -Wno-error=unused-but-set-variable \
-			-Wno-error=unused-result -mfloat-abi=hard -I. -I$(STAGING_DIR)/usr/lib/libnet-1.2.x/include/" \
+		CFLAGS+="-Os -pipe -fno-caller-saves -fno-plt -fhonour-copts -Wno-error=unused-but-set-variable \
+			-Wno-error=unused-result -I. -I$(STAGING_DIR)/usr/lib/libnet-1.2.x/include/" \
 		LDFLAGS+="-L$(STAGING_DIR)/usr/lib -L$(STAGING_DIR)/usr/lib/libnet-1.2.x/lib -lnet -lpcap" \
 		tcpkill
 endef
