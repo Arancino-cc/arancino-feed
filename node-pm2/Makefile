@@ -55,14 +55,14 @@ define Build/Compile
 endef
 
 define Package/node-pm2/install
-	$(INSTALL_DIR) $(1)/usr/lib/node
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/* $(1)/usr/lib/node/
+	$(INSTALL_DIR) $(1)/usr/lib/node_modules
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/* $(1)/usr/lib/node_modules
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(LN) ../lib/node/pm2/bin/pm2 $(1)/usr/bin/pm2
-	$(LN) ../lib/node/pm2/bin/pm2-daemon $(1)/usr/bin/pm2-daemon
-	$(LN) ../lib/node/pm2/bin/pm2-dev $(1)/usr/bin/pm2-dev
-	$(LN) ../lib/node/pm2/bin/pm2-docker $(1)/usr/bin/pm2-docker
-	$(LN) ../lib/node/pm2/bin/pm2-runtime $(1)/usr/bin/pm2-runtime
+	$(LN) ../lib/node_modules/pm2/bin/pm2 $(1)/usr/bin/pm2
+	$(LN) ../lib/node_modules/pm2/bin/pm2-daemon $(1)/usr/bin/pm2-daemon
+	$(LN) ../lib/node_modules/pm2/bin/pm2-dev $(1)/usr/bin/pm2-dev
+	$(LN) ../lib/node_modules/pm2/bin/pm2-docker $(1)/usr/bin/pm2-docker
+	$(LN) ../lib/node_modules/pm2/bin/pm2-runtime $(1)/usr/bin/pm2-runtime
 endef
 
 $(eval $(call BuildPackage,node-pm2))

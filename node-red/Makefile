@@ -7,12 +7,19 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=node-red
 PKG_NAME:=node-red
-PKG_VERSION:=0.17.5
-PKG_RELEASE:=3
+PKG_VERSION:=0.18.5
+PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
-PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
-PKG_MD5SUM:=849fa09974457e04249480ae18565ae3
+#PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
+#PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
+#PKG_MD5SUM:=849fa09974457e04249480ae18565ae3
+
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/node-red/node-red.git
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=4a4513a746850ba982ec0ab82dacc045bb85ff31
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+
 
 PKG_BUILD_DEPENDS:=node
 PKG_NODE_VERSION:=6.11.4
@@ -49,12 +56,12 @@ define Build/Compile
 endef
 
 define Package/node-red/install
-	$(INSTALL_DIR) $(1)/usr/lib/node
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/* $(1)/usr/lib/node
+	$(INSTALL_DIR) $(1)/usr/lib/node_modules
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/* $(1)/usr/lib/node_modules
 
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(LN) ../lib/node/node-red/red.js $(1)/usr/bin/node-red
-	$(LN) ../lib/node/node-red/bin/node-red-pi $(1)/usr/bin/node-red-pi
+	$(LN) ../lib/node_modules/node-red/red.js $(1)/usr/bin/node-red
+	$(LN) ../lib/node_modules/node-red/bin/node-red-pi $(1)/usr/bin/node-red-pi
 endef
 
 define Package/$(PKG_NAME)/postrm
