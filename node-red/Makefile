@@ -7,18 +7,19 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=node-red
 PKG_NAME:=node-red
-PKG_VERSION:=0.18.5
-PKG_RELEASE:=1
+PKG_VERSION:=0.18.4
+PKG_RELEASE:=2
 
-#PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
-#PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
-#PKG_MD5SUM:=849fa09974457e04249480ae18565ae3
+PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
+PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
+PKG_HASH:=aeadc40c65a7c2f4191720dfa56d6f5f10c44df9
+PKG_MD5SUM:=ad0157da50f2863b024cfa4c5af2ce52
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/node-red/node-red.git
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=4a4513a746850ba982ec0ab82dacc045bb85ff31
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+#PKG_SOURCE_PROTO:=git
+#PKG_SOURCE_URL:=https://github.com/node-red/node-red.git
+#PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+#PKG_SOURCE_VERSION:=aeadc40c65a7c2f4191720dfa56d6f5f10c44df9
+#PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
 
 PKG_BUILD_DEPENDS:=node
@@ -62,6 +63,8 @@ define Package/node-red/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(LN) ../lib/node_modules/node-red/red.js $(1)/usr/bin/node-red
 	$(LN) ../lib/node_modules/node-red/bin/node-red-pi $(1)/usr/bin/node-red-pi
+	#Needed to fix issue with bash
+	patch -p1 $(1)/usr/lib/node_modules/node-red/bin/node-red-pi < ./patches/900-fix_old_bash.patch
 endef
 
 define Package/$(PKG_NAME)/postrm

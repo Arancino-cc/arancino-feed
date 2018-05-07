@@ -56,6 +56,7 @@ endef
 define Package/node-red-node-serialport/install
 	$(INSTALL_DIR) $(1)/usr/lib/node_modules
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/* $(1)/usr/lib/node_modules
+	$(LN) ./node-red-nodes/io/serialport $(1)/usr/lib/node_modules/node-red-contrib-serialport
 endef
 
 define Package/$(PKG_NAME)/postrm
