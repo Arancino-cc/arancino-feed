@@ -6,6 +6,7 @@ NODE_IOTRONIC_INSTALL='/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/util
 
 if [ -e ${NODE_IOTRONIC_INSTALL}/install_LR_arancino.sh ]
 	then
+	 chmod a+x ${NODE_IOTRONIC_INSTALL}/install_LR_arancino.sh
 	 ${NODE_IOTRONIC_INSTALL}/install_LR_arancino.sh
 fi 
 

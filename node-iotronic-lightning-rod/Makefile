@@ -7,16 +7,16 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.0.4
-PKG_RELEASE:=5
+PKG_VERSION:=2.1.0
+PKG_RELEASE:=3
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
-#PKG_SOURCE_URL:=https://github.com/MDSLab/s4t-lightning-rod.git
-PKG_SOURCE_URL:=https://github.com/Arancino-cc/s4t-lightning-rod.git
+PKG_SOURCE_URL:=https://github.com/MDSLab/s4t-lightning-rod.git
+PKG_REV:=refact_plugin_nodered
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=7b18982d5b4b279439d904daa29759cde958b37e
-#PKG_SOURCE_VERSION:=2e32eea18b6daf5e8624389ea8366b0a5b36ad8a
+PKG_SOURCE_VERSION:=$(PKG_REV)
+#PKG_SOURCE_VERSION:=7b18982d5b4b279439d904daa29759cde958b37e
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
 PKG_BUILD_DEPENDS:=node libc libpthread
@@ -64,6 +64,7 @@ define Package/node-iotronic-lightning-rod/install
 	$(1)/usr/lib/node_modules/$(PKG_ORG)
 	$(CP) ./files/uci-defaults/58_var_config $(1)/etc/uci-defaults
 	chmod +x $(1)/etc/uci-defaults/*
+	chmod +x $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/utils/install/arancino/*
 endef
 
 $(eval $(call BuildPackage,node-iotronic-lightning-rod))
