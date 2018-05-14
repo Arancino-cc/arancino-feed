@@ -1,0 +1,772 @@
+#!/bin/sh
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#!/bin/sh
+
+# has_sd=`mount | grep ^/dev/sda | grep 'on /overlay'`
+
+disclaimer () {
+
+echo ""
+
+echo -e "DISCLAIMER :\n"
+
+echo -e "This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details."
+
+}
+
+returngigs () {
+
+	size=`fdisk -l | grep "Disk /dev/sda" | awk {'print $5'}`
+
+	#echo "Size detected: $size"
+	if [ $size -lt 64500000000 -a $size -gt 63000000000 ]
+
+	  then
+
+	    sizetoformat=+'30000MB'
+	    #echo "Size partition: $sizetoformat"
+	    return 0
+
+	elif [ $size -lt 32500000000 -a $size -gt 31000000000 ]
+
+	  then
+
+	    sizetoformat=+'30500MB'
+	    return 0
+
+
+	elif [ $size -lt 16500000000 -a $size -gt 15000000000 ]
+
+	  then
+
+	    sizetoformat=+'14500MB'
+	    return 0
+
+	elif [ $size -lt 8500000000 -a $size -gt 7000000000 ]
+
+	  then
+
+	    sizetoformat=+'7000MB'
+	    return 0
+
+	elif [ $size -lt 4500000000 -a $size -gt 3000000000 ]
+
+	  then
+
+	    sizetoformat=+'3000MB'
+	    return 0
+
+	elif [ $size -lt 2500000000 -a $size -gt 1000000000 ]
+
+	  then
+
+	    sizetoformat=+'1000MB'
+	    return 0
+
+	elif [ $size -lt 1500000000 -a $size -gt 900000000 ]
+
+	  then
+
+	    sizetoformat=+'512M'
+	    return 0
+
+	else
+
+	    echo "Drive size mismatch ! ! ! Terminating the program..."
+	    return 1
+
+	fi
+
+}
+
+umountsda1 () {
+
+	if `grep -qs '/dev/sda1' /proc/mounts`
+	then
+
+	    umount /dev/sda1
+
+	fi
+}
+
+
+umountallsda () {
+
+	if `df | grep -qs sda`
+	then
+
+	    df | grep sda | awk {'print $1'} | xargs umount
+
+	fi
+
+}
+
+swapoffallsda () {
+
+	if `cat /proc/swaps | grep -qs sda`
+	then
+
+	    #cat /proc/swaps | grep sda | awk {'print $1'} | xargs swapoff
+		swapoff -a
+
+	fi
+
+}
+
+formatssd () {
+
+        sleep 5
+
+        #Killing all existing blocks on the device
+        lsof | grep /dev/sda1 | grep -v sh | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+        #Umounts all the sda partitions
+        umountallsda
+
+        echo ""
+        echo "Low level formatting the drive..."
+        echo ""
+
+        #Low level formatting
+        dd if=/dev/zero of=/dev/sda bs=512 count=1
+
+        # Creation of the primary and swap partitions
+        # Feeding inputs to fdisk in non-interactive mode
+
+        echo ""
+        echo "Partitioning drive..."
+        echo ""
+
+        (echo n; echo p; echo 1; echo ;echo $1; echo w) | fdisk /dev/sda
+        (echo n; echo p; echo 2; echo ;echo ; echo w) | fdisk /dev/sda
+
+        partx -u /dev/sda
+
+        sleep 20
+
+        umountallsda
+
+        sleep 10
+	
+        echo ""
+        echo "Formatting partition 01..."
+        echo ""
+
+        mkfs.f2fs -l driveSSD-01 /dev/sda1
+
+        sleep 10
+
+        echo ""
+        echo "Formatting partition 02..."
+        echo ""
+
+	mkfs.f2fs -l driveSSD-02 /dev/sda2
+}
+
+formatsdcard () {
+
+  	sleep 5
+
+	#Killing all existing blocks on the device
+	lsof | grep /dev/sda1 | grep -v sh | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+	#Umounts all the sda partitions
+	umountallsda
+
+	#Swaps-off any activated swap partition in sda device
+	#swapoffallsda
+
+	echo ""
+	echo "Low level formatting the drive..."
+	echo ""
+
+	#Low level formatting
+	dd if=/dev/zero of=/dev/sda bs=512 count=1
+
+	# Creation of the primary and swap partitions
+	# Feeding inputs to fdisk in non-interactive mode
+
+	echo ""
+	echo "Partitioning drive..."
+	echo ""
+
+	(echo n; echo p; echo 1; echo ;echo $1; echo w) | fdisk /dev/sda
+    (echo n; echo p; echo 2; echo ;echo ; echo t; echo 2; echo 82; echo w) | fdisk /dev/sda
+
+	sleep 20
+
+	umountallsda
+
+	sleep 10
+
+	mkfs.ext3 -L driveSD -F /dev/sda1
+
+	sleep 10
+
+	mkswap -L swapSD /dev/sda2
+
+}
+
+
+formatvfatoverlay () {
+
+ 	if `grep -qs '/dev/sda1 /mnt/sda1' /proc/mounts`
+	then
+
+		sleep 5
+
+		lsof | grep sda1 | grep -v sh | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+		lsof | grep sda2 | grep -v sh | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+		# Unmounting all /dev/sdX partitions
+		# umount /overlay
+		# umount /overlay-boot
+		umountallsda
+
+		sleep 5
+
+		#Disable all swap partitions
+		swapoff -a
+
+		sleep 5
+
+		echo ""
+		echo "Low level formatting the SDCard..."
+		echo ""
+
+		#Low level formatting
+		dd if=/dev/zero of=/dev/sda bs=512 count=1
+
+		#Creation of the primary partition
+		# Feeding inputs to fdisk in non-interactive mode
+
+		sleep 5
+
+		# Unmounting all /dev/sdX partitions
+		umountallsda
+
+		lsof | grep sda1 | grep -v sh | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+		sleep 10
+
+		echo ""
+		echo "Partitioning SDCard..."
+		echo ""
+
+		(echo n; echo p; echo 1; echo ; echo ; echo t; echo c; echo w) | fdisk /dev/sda
+
+		sleep 7
+
+		umountallsda
+
+		echo ""
+		echo "Formatting disk to FAT32..."
+		echo ""
+
+		sleep 10
+
+		mkfs.msdos -F 32 /dev/sda1
+
+		sleep 10
+
+		mount /dev/sda1 /mnt/sda1
+
+	elif `grep -qs '/dev/sda1 /overlay' /proc/mounts` && `grep -qs '/dev/sda2' /proc/swaps`
+	then
+
+		echo ""
+		echo "Pivot Overlay is still enabled, please first disable it with choice number 2 !"
+		echo ""
+
+	else
+
+		echo ""
+		echo "ERROR ! System not reverted !"
+		echo ""
+
+	fi
+
+
+}
+
+logo () {
+cat <<"EOT"
+    _                         _             
+   / \   _ __ __ _ _ __   ___(_)_ __   ___  
+  / _ \ | '__/ _` | '_ \ / __| | '_ \ / _ \ 
+ / ___ \| | | (_| | | | | (__| | | | | (_) |
+/_/   \_\_|  \__,_|_| |_|\___|_|_| |_|\___/ 
+                                            
+ ___           _        _ _           
+|_ _|_ __  ___| |_ __ _| | | ___ _ __ 
+ | || '_ \/ __| __/ _` | | |/ _ \ '__|
+ | || | | \__ \ || (_| | | |  __/ |   
+|___|_| |_|___/\__\__,_|_|_|\___|_|   
+                                      
+EOT
+}
+
+welcome () {
+	  logo
+
+      echo "Welcome to Arancino OS installation"
+      echo ""
+}
+
+fstabclean () {
+
+	#Delete tab spaces and trailing blank lines in /etc/config/fstab
+	mv /etc/config/fstab /etc/config/fstab_node
+	sed -i -e "s/[[:space:]]$//" /etc/config/fstab_node
+	sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' /etc/config/fstab_node > /etc/config/fstab
+	rm /etc/config/fstab_node
+
+}
+
+fstaboverlay () {
+
+uuid1=`blkid | grep "driveSSD-01" | awk {'print $3'} | sed 's/UUID=//g' | sed -e 's/'\"'/'\''/g'`
+uuid2=`blkid | grep "driveSSD-02" | awk {'print $3'} | sed 's/UUID=//g' | sed -e 's/'\"'/'\''/g'`
+#Inserts the mount points in /etc/config/fstab
+cat <<EOF
+
+#startoverlayconfig
+
+config 'mount'
+        option  target  '/'
+        option  uuid    $uuid1
+        option  enabled '1'
+        option  options rw,sync
+        option  enabled_fsck     0
+
+config 'mount'
+        option  target  '/mnt/sda2'
+        option  uuid    'a7a96f23-5945-46b4-b287-2c0f93ed1682'
+        option  enabled '0'
+
+#endoverlayconfig
+EOF
+}
+
+prereqs () {
+
+	opkg update
+	opkg install fdisk e2fsprogs lsof partx-utils
+
+}
+
+removeprereqs () {
+
+	opkg update
+	opkg remove fdisk e2fsprogs lsof partx-utils
+
+}
+
+
+revertoverlay (){
+
+	mount -o remount,rw /dev/root
+	PREFIX=/rom
+	mv $PREFIX/etc/config/fstab $PREFIX//etc/config/fstab_overlay
+
+	#Delete the strings for the pivot overlay setup
+	sed -i '/#startoverlayconfig/,/#endovlerlayconfig/d' $PREFIX//etc/config/fstab_overlay
+
+	#Delete the trailing blank lines
+	sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $PREFIX//etc/config/fstab_overlay > $PREFIX//etc/config/fstab
+	rm $PREFIX//etc/config/fstab_overlay
+
+	#Updates the new /etc/profile
+	source /etc/profile > /dev/null
+
+	#filesystem check
+	#e2fsck /dev/mmcblk0p2
+
+}
+
+countdown() {
+	IFS=:
+	set -- $*
+	secs=$(( ${1#0} * 3600 + ${2#0} * 60 + ${3#0} ))
+	while [ $secs -gt 0 ]
+	do
+		sleep 1 &
+		printf "\r%02d:%02d:%02d" $((secs/3600)) $(( (secs/60)%60)) $((secs%60))
+		secs=$(( $secs - 1 ))
+		wait
+	done
+	echo
+}
+
+systemoverlay () {
+
+	#Mounts the newly created partitions
+	mkdir -p /tmp/introot
+	mkdir -p /tmp/extroot
+	
+	mount --bind / /tmp/introot
+	mount /dev/sda1 /tmp/extroot
+
+	sleep 2
+
+	#Backups the /etc/fstab file
+	cp /etc/config/fstab /etc/config/fstab_bak
+
+	#Deleting tab and trailing spaces
+	fstabclean
+
+	sleep 2
+
+	#Adding the mount entries to /etc/config/fstab
+	fstaboverlay >> /etc/config/fstab
+
+	sleep 2
+
+	#Creates the overlay on the SSD
+	tar -C /tmp/introot -cf - . | tar -C /tmp/extroot -xf -
+
+	umount /tmp/introot
+	umount /tmp/extroot
+
+	#Updates the /etc/profile file
+	source /etc/profile > /dev/null
+
+}
+
+alignSDCard () {
+
+	#Mounts the newly created partitions
+	mkdir -p /tmp/extroot
+	
+	mount --bind / /tmp/extroot
+	mount -o remount,rw /dev/root
+
+	sleep 2
+
+	#Backups the /etc/fstab file
+	cp /rom/etc/config/fstab_bak /rom/etc/config/fstab
+
+	sleep 2
+
+	#Creates the overlay on the SSD
+	tar -C /tmp/extroot -cvf - . | tar -C /rom -xf -
+
+	umount /tmp/introot
+	mount -o remount,ro /dev/root
+
+	#Updates the /etc/profile file
+	source /etc/profile > /dev/null
+
+}
+
+initialize_configure () {
+	echo ""
+	prereqs
+
+	sleep 2
+
+	echo ""
+	echo "Erasing all data..."
+	echo ""
+
+	#Returns the size of the SSD
+	returngigs
+
+	#Formats the SSD according to its size
+	formatssd $sizetoformat
+
+	sleep 5
+
+	#Updates the system settings
+	systemoverlay
+
+	sleep 2
+
+	echo ""
+	echo "Pivot Overlay accomplished ! Your system will be rebooted in 10 seconds !"
+	echo ""
+
+	p=0
+
+	done="true"
+
+	countdown "00:00:10"
+
+	echo ""
+	echo "Rebooting....."
+	echo ""
+
+	reboot && exit
+}
+
+revert () {
+	echo ""
+	echo "Reverting to defaults..."
+	echo ""
+
+	sleep 2
+
+	# Reverts the system settings to the default ones
+	revertoverlay
+
+	sleep 3
+
+	p=0
+
+	done="true"
+
+	echo ""
+	echo "Reverting complete ! Your system will be rebooted in 10 seconds !"
+	echo "Reverting complete ! Your system will be rebooted in 10 seconds !" > /dev/kmsg
+	echo ""
+
+	countdown "00:00:10"
+
+	echo ""
+	echo "Rebooting....."
+	echo "Rebooting....." > /dev/kmsg
+	echo ""
+
+	reboot && exit
+
+}
+
+#--------------------------------MENU-START----------------------------------------
+
+if ([ "$1" == "-i" ])
+then
+
+      clear
+
+      disclaimer
+
+      echo ""
+      read -p "Press [Enter] key to continue..."
+      echo ""
+
+      clear
+
+	while [ "$done" != "true" ]
+	do
+
+	  welcome
+
+      echo "Arancino installation menu"
+      echo ""
+	  echo "1. Initialize SSD and Configure Extroot"
+	  echo "2. Uninstall Extroot"
+	  echo "3. Update ReadOnly SDCard"
+      echo "4. Exit and reboot"
+      echo "0. Exit"
+
+
+      echo " "
+      echo "Choose : "
+      echo " "
+
+      read scelta
+
+			case $scelta in
+
+
+
+				#------------------Choice-1----------------------
+				# Initialize SSD and Configure Extroot
+				1)
+				echo " "
+				#-----------INNER-LOOP---------------------------------------------
+
+				p=1
+
+				while [ $p != 0 ]
+
+				do
+
+					if `block info | grep -qs '/dev/sda'`
+					then
+						echo ""
+						echo "Drive discovered..,."
+						
+						if ! `grep -qs '/dev/sda1 /' /proc/mounts` 
+						then
+							echo ""
+							echo "WARNING : All data on your SSD Would will be erased, are you sure ? (y/n)"
+							echo ""
+
+							read YN
+
+							case $YN in
+							[yY]*)
+								initialize_configure
+								;;
+							[nN]*)
+								  echo ""
+								  echo "Good Bye for now..."
+								  echo ""
+
+								  p=0
+							    ;;
+							    *)
+								  echo ""
+								  echo "You have to make a choice !"
+								  echo ""
+							    ;;
+							esac
+						else
+							#statements
+							echo ""
+							echo "Extroot already mounted. Try to unmount before..."
+							echo ""
+							read
+
+							p=0
+						fi
+					else
+
+						echo ""
+						echo "No device discovered. Aborting..."
+						echo ""
+						read
+
+						p=0
+
+					fi
+				done
+				;;
+
+				#----------------- Choice-2---------------------
+				# Uninstall Extroot
+				2)
+				if `grep -qs '/dev/sda1 /' /proc/mounts`
+				then
+					revert
+				else
+					echo ""
+					echo "Extroot already unistalled."
+					read
+					p=0
+				fi
+
+				;;
+
+				#----------------- Choice-3---------------------
+				# Update ReadOnly SDCard
+				3)
+				if ! `grep -qs '/dev/sda1 /' /proc/mounts`
+				then
+
+					echo ""
+					echo "Updating SDcard..."
+					echo ""
+
+					sleep 2
+
+					echo "NEED TO BE IMPLEMENTED"
+					echo ""
+					echo "Update complete !"
+					echo ""
+					read
+
+				else
+
+					echo ""
+					echo "Extroot need to be installed."
+					echo ""
+
+				fi
+
+				;;
+
+				#------------------Choice-4----------------------
+				# System reboot
+				4)
+
+				echo ""
+				echo "Your system will be rebooted in 10 seconds !"
+				echo ""
+
+				countdown "00:00:10"
+
+				echo ""
+				echo "Rebooting..."
+				echo ""
+
+				done="true" && reboot && exit
+
+				;;
+
+				#------------------Choice-0----------------------
+				# Terminating script
+				0)
+				echo " "
+				echo "Done !"
+				echo " "
+
+				done="true"
+				exit 0
+				;;
+
+				#--------Anychoice---------------------
+				*)
+				echo ""
+				echo "You have to make a choice !"
+				echo ""
+				;;
+			esac
+
+	done
+
+elif ( `block info | grep -qs '/dev/sda'` && returngigs ) && [ -z $1 ]
+then
+
+	welcome
+
+	if `grep -qs '/dev/sda1 /' /proc/mounts`
+	then
+		echo ""
+		echo "Overlay already up and running ! Aborting..."
+		echo "Overlay already up and running ! Aborting..." > /dev/kmsg
+		echo ""
+
+		exit 0
+	fi
+	
+	inizialize_configure
+	
+elif ([ "$1" == "-h" ])
+then
+	echo ""
+	echo "Usage:"
+	echo " installer 		inizialize ssd and install extroot"
+	echo " installer -i 		interactive menu"
+	echo " installer -r 		revert extroot configuration to sdcard"
+elif ([ "$1" == "-r" ])
+then
+	revert
+
+elif ! `block info | grep -qs '/dev/sda'`
+then
+
+	echo ""
+	echo "Can't mount SSD drive, check your system configuration !"
+	echo "Can't mount SSD drive, check your system configuration !" > /dev/kmsg
+	echo ""
+fi
