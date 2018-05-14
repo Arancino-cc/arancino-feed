@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=node-red
 PKG_NAME:=node-red
 PKG_VERSION:=0.18.4
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
