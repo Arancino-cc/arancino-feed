@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=node-red-contrib-ibm-watson-iot
 PKG_NAME:=node-red-contrib-ibm-watson-iot
 PKG_VERSION:=0.2.8
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
@@ -51,10 +51,6 @@ endef
 define Package/node-red-contrib-ibm-watson-iot/install
 	$(INSTALL_DIR) $(1)/usr/lib/node_modules
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/* $(1)/usr/lib/node_modules
-
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(LN) ../lib/node/node-red/red.js $(1)/usr/bin/node-red
-	$(LN) ../lib/node/node-red/bin/node-red-pi $(1)/usr/bin/node-red-pi
 endef
 
 define Package/$(PKG_NAME)/postrm
