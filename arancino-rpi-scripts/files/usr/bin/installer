@@ -749,7 +749,7 @@ then
 		exit 0
 	fi
 	
-	inizialize_configure
+	initialize_configure
 	
 elif ([ "$1" == "-h" ])
 then
