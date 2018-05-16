@@ -1,6 +1,9 @@
 # Put your custom commands here that should be executed once
 # the system init finished. By default this file does nothing.
 
-#wifi-live-or-reset
+
+# enable RTC and read the clock from it
+echo ds3231 0x68 > /sys/class/i2c-dev/i2c-1/device/new_device 
+hwclock -r
 
 exit 0
