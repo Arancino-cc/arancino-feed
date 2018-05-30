@@ -3,13 +3,34 @@
 
 START=99
 LOG=/var/log/node-red.log
+USER=root
 
 start() {
-        node-red-pi >> $LOG & 
+        if pgrep ^node-red$ > /dev/null
+        then
+                echo "Node-RED already running."
+        else
+                echo "Starting Node-Red.."
+                touch $LOG
+                chown $USER:$USER $LOG
+                echo "" >> $LOG
+                echo "Node-RED service start: "$(date) >> $LOG
+                su -l $USER -c "node-red-pi --max-old-space-size=128 -u ~/.node-red >> $LOG &"
+        fi
 }
 
 stop() {
-        killall node-red
+        echo "Stopping Node-Red.."
+        pkill -SIGINT ^node-red$
+        sleep 2
+        echo "" >> $LOG
+        echo "Node-RED service stop: "$(date) >> $LOG
 }
 
+restart() {
+        echo "Restarting Node-Red.."
+        stop
+        sleep 2
+        start
+}
 
