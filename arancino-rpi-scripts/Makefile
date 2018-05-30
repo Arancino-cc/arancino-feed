@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=14
+PKG_RELEASE:=17
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -34,10 +34,11 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/usb
 	#$(INSTALL_DIR) $(1)/etc/smartme
 
 	# /etc
-	#$(INSTALL_DATA) ./files/etc/rc.local $(1)/etc
+	#$(INSTALL_BIN) ./files/etc/rc.local $(1)/etc
 
 	# /etc/config DIR
 	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config/wireless
@@ -57,6 +58,10 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/etc/init.d/can-setup $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/node-red $(1)/etc/init.d
 
+	# /etc/init.d
+	$(INSTALL_BIN) ./files/etc/hotplug.d/usb/21-ftdi-usb $(1)/etc/hotplug.d/usb
+	
+
 	$(CP) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
 endef
 
@@ -69,8 +74,10 @@ then
 fi
 if [ -e $${IPKG_INSTROOT}/boot/config.txt ]
 then
-        # enable spi and configure can interface
-	@echo dtoverlay=spi0-cs,cs0_pin=8 >> $${IPKG_INSTROOT}/boot/config.txt
+    # enable spi and configure can interface
+	#@echo dtoverlay=spi0-cs,cs0_pin=8 >> $${IPKG_INSTROOT}/boot/config.txt
+	#@echo dtoverlay=mcp2515-can0,interrupt=6 >> $${IPKG_INSTROOT}/boot/config.txt
+	@echo dtoverlay=spi0-cs,cs1_pin=7 >> $${IPKG_INSTROOT}/boot/config.txt
 	@echo dtoverlay=mcp2515-can0,interrupt=6 >> $${IPKG_INSTROOT}/boot/config.txt
 fi
 exit 0
