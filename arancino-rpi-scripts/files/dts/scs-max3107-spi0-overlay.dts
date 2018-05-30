@@ -1,0 +1,98 @@
+/*
+ * Device tree overlay for max3107 on spi0.0
+ * Chip select: BRCM pin 7 (header pin 26)
+ * Interrupt: BRCM pin 27 (header pin 13)
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "brcm,bcm2835", "brcm,bcm2836", "brcm,bcm2708", "brcm,bcm2709";
+    /* disable spi-dev for spi0.1 */
+    fragment@0 {
+        target = <&spi0>;
+        __overlay__ {
+            status = "okay";
+        };
+    };
+
+    fragment@1 {
+        target = <&spidev0>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+
+    fragment@2 {
+        target = <&spidev1>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+
+    /* the interrupt pin of the UART chip */
+    fragment@3 {
+        target = <&gpio>;
+        __overlay__ {
+            max0_pins: max0_pins {
+                brcm,pins = <27>;
+                brcm,function = <0>; /* input */
+            };
+        };
+    };
+
+
+    /* the clock/oscillator of the UART chip */
+    
+/*
+ *********************************************
+ * In order to use the internal oscillator, we just disable all clocks
+ *********************************************
+    fragment@4 {
+        target-path = "/clocks";
+        __overlay__ {
+            max0_osc: max0_osc {
+                compatible = "fixed-clock";
+                #clock-cells = <0>;
+                clock-frequency  = <1800000>;
+            };
+        };
+    };
+*/
+
+    /* the spi config of the MAX3107 controller itself binding everything together */
+    fragment@5 {
+        target = <&spi0>;
+        __overlay__ {
+            /* needed to avoid dtc warning */
+            #address-cells = <1>;
+            #size-cells = <0>;
+            max0: max3107@1 {
+                reg = <1>; /* Chip select 1 (brcm pin 7) */
+                compatible = "maxim,max3107";
+                pinctrl-names = "default";
+                pinctrl-0 = <&max0_pins>;
+/*
+ *********************************************
+ * In order to use the internal oscillator, we just disable all clocks
+ *********************************************
+                clock-names = "xtal";
+                clocks = <&max0_osc>;
+*/
+                spi-max-frequency = <32000000>;
+                interrupt-parent = <&gpio>;
+                interrupts = <27 0x2>; /* IRQ_TYPE_EDGE_FALLING = 0x2 */
+                gpio-controller;
+                #gpio-cells = <2>;
+            };
+        };
+    };
+    __overrides__ {
+/*
+        oscillator = <&max0_osc>,"clock-frequency:0";
+*/
+        spimaxfrequency = <&max0>,"spi-max-frequency:0";
+        interrupt = <&max0_pins>,"brcm,pins:0",<&max0>,"interrupts:0";
+    };
+};
