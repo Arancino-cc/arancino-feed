@@ -8,7 +8,7 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.1.2
-PKG_RELEASE:=7
+PKG_RELEASE:=12
 PKG_MD5SUM:=d32dca94a2675bd958668f42c2666c1d4b32166c
 PKG_ORG:=@mdslab
 
@@ -59,13 +59,13 @@ define Build/Compile
 endef
 
 define Package/node-iotronic-lightning-rod/install
-	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	# $(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/usr/lib/node_modules/$(PKG_ORG)
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME) \
 	$(1)/usr/lib/node_modules/$(PKG_ORG)
-	$(CP) ./files/uci-defaults/58_var_config $(1)/etc/uci-defaults
-	chmod +x $(1)/etc/uci-defaults/*
-	# chmod +x $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/utils/install/arancino/*
+	# $(CP) ./files/uci-defaults/58_var_config $(1)/etc/uci-defaults
+	# chmod +x $(1)/etc/uci-defaults/*
+	chmod +x $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/utils/install/arancino/*
 
 	# Configure IoTronic ENV
 	mkdir -p $(1)/var/lib/iotronic/
@@ -79,22 +79,15 @@ define Package/node-iotronic-lightning-rod/install
 
 	# Configure IoTronic Log
 	mkdir -p $(1)/var/log/iotronic/plugins
+	mkdir -p $(1)/etc/logrotate.d/plugins
 	touch $(1)/var/log/iotronic/lightning-rod.log
 	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 
-	# Configure Profile
-	@echo "export NODE_PATH=/usr/lib/node_modules" >> $(1)/etc/profile
-	@echo "export IOTRONIC_HOME=/var/lib/iotronic" >> $(1)/etc/profile
-	@echo "export LIGHTNINGROD_HOME=/usr/lib/node_modules/@mdslab/iotronic-lightning-rod" >> $(1)/etc/profile
-	@echo "export NODE_TLS_REJECT_UNAUTHORIZED=0" >> $(1)/etc/profile
-
 	# configure init.d 
-	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/init.d/s4t-lightning-rod_openwrt /etc/init.d/lightning-rod
+	mkdir -p $(1)/etc/init.d/
+	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/init.d/s4t-lightning-rod_openwrt $(1)/etc/init.d/lightning-rod
 	sed -i "s/<LIGHTNINGROD_HOME>/export LIGHTNINGROD_HOME=\/usr\/lib\/node_modules\/@mdslab\/iotronic-lightning-rod/g" $(1)/etc/init.d/lightning-rod
 	chmod +x $(1)/etc/init.d/lightning-rod
-
-	# Configure cron
-	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/cron.d/root_openwrt $(1)/etc/crontabs/root
 
 endef
 
@@ -104,6 +97,25 @@ if [ -e $${IPKG_INSTROOT}/var/lib/iotronic/settings.json ]
 then
 	# set the new default password
 	logger -t DEBUG "Settings file already present"
+else
+	logger -t DEBUG "Settings file missing. Add a default one $${PKG_ORG}/$${PKG_NPM_NAME}"
+	cp /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/settings.example.json /var/lib/iotronic/settings.json
+fi
+
+if [ -e $${IPKG_INSTROOT}/etc/crontabs/root ]
+then
+	/etc/init.d/lightning-rod stop
+	cp /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/etc/cron.d/root_openwrt /etc/crontabs/root
+	source /etc/profile
+	/etc/init.d/lightning-rod start
+fi
+
+if [ ! grep "IOTRONIC_HOME" /etc/profile ]
+	# Configure Profile
+	@echo "export NODE_PATH=/usr/lib/node_modules" >> /etc/profile
+	@echo "export IOTRONIC_HOME=/var/lib/iotronic" >> /etc/profile
+	@echo "export LIGHTNINGROD_HOME=/usr/lib/node_modules/@mdslab/iotronic-lightning-rod" >> /etc/profile
+	@echo "export NODE_TLS_REJECT_UNAUTHORIZED=0" >> /etc/profile
 fi
 exit 0
 endef
