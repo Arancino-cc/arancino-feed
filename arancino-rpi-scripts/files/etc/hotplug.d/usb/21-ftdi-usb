@@ -2,6 +2,8 @@
 
 FTDI_PRODID="403/6001/600"
 SYMLINK="ttyFTDI"
+BAUDRATE=115200
+
 
 #env >> /tmp/hotplug.log
 
@@ -15,6 +17,7 @@ if [ "${PRODUCT}" = "${FTDI_PRODID}" ];
          fi
          logger -t Hotplug Device name of ftdi is $DEVICE_NAME
          ln -s /dev/$DEVICE_NAME /dev/${SYMLINK}
+         stty -F /dev/${SYMLINK} ${BAUDRATE}
          logger -t Hotplug Symlink from /dev/$DEVICE_NAME to /dev/${SYMLINK} created
    fi
 fi
