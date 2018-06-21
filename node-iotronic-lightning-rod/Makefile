@@ -8,7 +8,7 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.1.2
-PKG_RELEASE:=12
+PKG_RELEASE:=15
 PKG_MD5SUM:=d32dca94a2675bd958668f42c2666c1d4b32166c
 PKG_ORG:=@mdslab
 
@@ -79,7 +79,7 @@ define Package/node-iotronic-lightning-rod/install
 
 	# Configure IoTronic Log
 	mkdir -p $(1)/var/log/iotronic/plugins
-	mkdir -p $(1)/etc/logrotate.d/plugins
+	mkdir -p $(1)/etc/logrotate.d
 	touch $(1)/var/log/iotronic/lightning-rod.log
 	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 
@@ -99,24 +99,45 @@ then
 	logger -t DEBUG "Settings file already present"
 else
 	logger -t DEBUG "Settings file missing. Add a default one $${PKG_ORG}/$${PKG_NPM_NAME}"
-	cp /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/settings.example.json /var/lib/iotronic/settings.json
+	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/settings.example.json $${IPKG_INSTROOT}/var/lib/iotronic/settings.json
+	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/modules/plugins-manager/plugins.example.json $${IPKG_INSTROOT}/var/lib/iotronic/plugins/plugins.json
+	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/modules/drivers-manager/drivers.example.json $${IPKG_INSTROOT}/var/lib/iotronic/drivers/drivers.json
 fi
 
-if [ -e $${IPKG_INSTROOT}/etc/crontabs/root ]
+if [ "`grep IOTRONIC_HOME $${IPKG_INSTROOT}/etc/profile`" == "" ]
 then
-	/etc/init.d/lightning-rod stop
-	cp /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/etc/cron.d/root_openwrt /etc/crontabs/root
-	source /etc/profile
-	/etc/init.d/lightning-rod start
+        # Configure Profile
+        echo "export NODE_PATH=/usr/lib/node_modules" >> $${IPKG_INSTROOT}/etc/profile
+        echo "export IOTRONIC_HOME=/var/lib/iotronic" >> $${IPKG_INSTROOT}/etc/profile
+        echo "export LIGHTNINGROD_HOME=/usr/lib/node_modules/@mdslab/iotronic-lightning-rod" >> $${IPKG_INSTROOT}/etc/profile
+        echo "export NODE_TLS_REJECT_UNAUTHORIZED=0" >> $${IPKG_INSTROOT}/etc/profile
+
+        source $${IPKG_INSTROOT}/etc/profile
+        #export NODE_PATH=/usr/lib/node_modules
+        #export IOTRONIC_HOME=/var/lib/iotronic
+        #export LIGHTNINGROD_HOME=/usr/lib/node_modules/@mdslab/iotronic-lightning-rod
+        #export NODE_TLS_REJECT_UNAUTHORIZED=0
+
+        echo "Environment configured."
+else
+        echo "Environment already configured"
 fi
 
-if [ ! grep "IOTRONIC_HOME" /etc/profile ]
-	# Configure Profile
-	@echo "export NODE_PATH=/usr/lib/node_modules" >> /etc/profile
-	@echo "export IOTRONIC_HOME=/var/lib/iotronic" >> /etc/profile
-	@echo "export LIGHTNINGROD_HOME=/usr/lib/node_modules/@mdslab/iotronic-lightning-rod" >> /etc/profile
-	@echo "export NODE_TLS_REJECT_UNAUTHORIZED=0" >> /etc/profile
+if [ "`grep $${IPKG_INSTROOT}/etc/init.d/lightning-rod $${IPKG_INSTROOT}/etc/crontabs/root`" == "" ]
+then
+        cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/etc/cron.d/root_openwrt $${IPKG_INSTROOT}/etc/crontabs/root
+        echo "Cron configured."
+else
+        echo "Cron already configured"
+
 fi
+
+if [ $${IPKG_INSTROOT} == "" ]
+then 
+	echo "Lightning-rod starting..."
+	/etc/init.d/lightning-rod restart
+fi
+
 exit 0
 endef
 
