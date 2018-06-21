@@ -36,6 +36,8 @@ define Package/$(PKG_NAME)/install
 	tar xzvf ./files/tar/scipy-1.1.0-4.tar.gz -C $(1)$(PYTHON3_PKG_DIR)/
 	tar xzvf ./files/tar/scikit_learn-0.19.1-2.tar.gz -C $(1)$(PYTHON3_PKG_DIR)/
 
+	find $(1)$(PYTHON3_PKG_DIR) -name "*.pyc" -delete
+	
 	$(LN) $(1)/usr/lib/libc.so $(1)/usr/lib/libc.so.3
 	$(LN) $(1)/usr/lib/libm.so $(1)/usr/lib/libm.so.6
 	$(LN) $(1)/usr/lib/libpthread.so $(1)/usr/lib/libpthread.so.0

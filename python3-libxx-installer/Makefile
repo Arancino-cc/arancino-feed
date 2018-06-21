@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python3-libxx-installer
 PKG_VERSION:=1.0
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 
 include $(INCLUDE_DIR)/package.mk
 include $(TOPDIR)/feeds/packages/lang/python/python3-package.mk
@@ -36,6 +36,7 @@ define Package/$(PKG_NAME)/install
 	tar xzvf ./files/tar/python3.6-pytz-2018.4.tar.gz -C $(1)$(PYTHON3_PKG_DIR)/
 	tar xzvf ./files/tar/python3.6-dateutil.tar.gz -C $(1)$(PYTHON3_PKG_DIR)/
 
+	find $(1)$(PYTHON3_PKG_DIR) -name "*.pyc" -delete
 	$(LN) $(1)/usr/lib/libtinfo.so.5 $(1)/usr/lib/libtinfo.so
 endef
 
@@ -45,7 +46,10 @@ define Package/$(PKG_NAME)/postinst
 	#mv readline.cpython-36m-arm-linux-gnueabihf.so readline.cpython-36.so
 	for x in `find . -name '*.cpython-36m-arm-linux-gnueabihf.so'`; do mv $$x `dirname $$x`/`basename $$x .cpython-36m-arm-linux-gnueabihf.so`.cpython-36.so; done
 	
-	$(LN) /usr/lib/libncurses.so /usr/lib/libncurses.so.5
+	if [ ! -e $${IPKG_INSTROOT}/usr/lib/libncurses.so.5 ]
+	then
+		ln $${IPKG_INSTROOT}/usr/lib/libncurses.so $${IPKG_INSTROOT}/usr/lib/libncurses.so.5
+	fi
 exit 0
 endef
 
