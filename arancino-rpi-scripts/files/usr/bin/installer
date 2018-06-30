@@ -599,8 +599,8 @@ then
 				while [ $p != 0 ]
 
 				do
-
-					if `block info | grep -qs '/dev/sda'`
+                                        size=`fdisk -l | grep "Disk /dev/sda" | awk {'print $5'}`
+                                        if (`block info | grep -qs '/dev/sda'`) || [ $size -gt 1000000 ]
 					then
 						echo ""
 						echo "Drive discovered..,."
