@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=17
+PKG_RELEASE:=19
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -35,14 +35,17 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/usb
+	$(INSTALL_DIR) $(1)/etc/opkg
 	#$(INSTALL_DIR) $(1)/etc/smartme
 
 	# /etc
-	#$(INSTALL_BIN) ./files/etc/rc.local $(1)/etc
+	$(INSTALL_BIN) ./files/etc/rc.local $(1)/etc
 
 	# /etc/config DIR
 	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config/wireless
 	$(INSTALL_CONF) ./files/etc/config/smartme $(1)/etc/config
+
+	$(INSTALL_DATA) ./files/etc/opkg/customfeeds.conf $(1)/etc/opkg/customfeeds.conf
 
 	# /usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/smartme-wifi-connect $(1)/usr/bin
@@ -75,10 +78,8 @@ fi
 if [ -e $${IPKG_INSTROOT}/boot/config.txt ]
 then
     # enable spi and configure can interface
-	#@echo dtoverlay=spi0-cs,cs0_pin=8 >> $${IPKG_INSTROOT}/boot/config.txt
-	#@echo dtoverlay=mcp2515-can0,interrupt=6 >> $${IPKG_INSTROOT}/boot/config.txt
-	@echo dtoverlay=spi0-cs,cs1_pin=7 >> $${IPKG_INSTROOT}/boot/config.txt
-	@echo dtoverlay=mcp2515-can0,interrupt=6 >> $${IPKG_INSTROOT}/boot/config.txt
+	echo dtoverlay=spi0-cs,cs0_pin=7 >> $${IPKG_INSTROOT}/boot/config.txt
+	echo dtoverlay=scs-max3107-spi0 >> $${IPKG_INSTROOT}/boot/config.txt
 fi
 exit 0
 endef
