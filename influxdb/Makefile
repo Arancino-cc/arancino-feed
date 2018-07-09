@@ -9,8 +9,9 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=influxdb
 PKG_VERSION_NAME:=1.5.4
+#PKG_VERSION_NAME:=1.4.2
 PKG_VERSION:=$(PKG_VERSION_NAME)-1
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION_NAME)_linux_armhf.tar.gz
 PKG_SOURCE_URL:=https://dl.influxdata.com/influxdb/releases/
@@ -52,10 +53,10 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) ./files/influxdb.init $(1)/etc/init.d/influxdb
 
 	$(INSTALL_DIR) $(1)/etc/config
-	#$(INSTALL_CONF) ./files/influxdb.conf $(1)/etc/config/influxdb
+	$(INSTALL_CONF) ./files/influxdb.conf $(1)/etc/config/influxdb
 
 	$(CP) $(PKG_BUILD_DIR)/etc/logrotate.d/influxdb $(1)/etc/logrotate.d
-	$(CP) $(PKG_BUILD_DIR)/etc/influxdb/* $(1)/etc/influxdb
+	#$(CP) $(PKG_BUILD_DIR)/etc/influxdb/* $(1)/etc/influxdb
 	$(CP) $(PKG_BUILD_DIR)/usr/lib/influxdb/scripts/* $(1)/usr/lib/influxdb/scripts
 	$(CP) $(PKG_BUILD_DIR)/usr/share/man/man1/* $(1)/usr/share/man/man1
 	$(CP) $(PKG_BUILD_DIR)/usr/bin/* $(1)/usr/bin
