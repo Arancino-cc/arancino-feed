@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=19
+PKG_RELEASE:=20
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -80,7 +80,11 @@ then
     # enable spi and configure can interface
 	echo dtoverlay=spi0-cs,cs0_pin=7 >> $${IPKG_INSTROOT}/boot/config.txt
 	echo dtoverlay=scs-max3107-spi0 >> $${IPKG_INSTROOT}/boot/config.txt
-fi
+fi 
+
+mkdir -p $${IPKG_INSTROOT}/etc/crontabs
+if ! grep -q hwclock $${IPKG_INSTROOT}/etc/crontabs/root; then echo $$'\n'"* */1 * * * hwclock -w" >>$${IPKG_INSTROOT}/etc/crontabs/root; fi
+
 exit 0
 endef
 
