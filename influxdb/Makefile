@@ -11,7 +11,7 @@ PKG_NAME:=influxdb
 PKG_VERSION_NAME:=1.5.4
 #PKG_VERSION_NAME:=1.4.2
 PKG_VERSION:=$(PKG_VERSION_NAME)-1
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION_NAME)_linux_armhf.tar.gz
 PKG_SOURCE_URL:=https://dl.influxdata.com/influxdb/releases/
