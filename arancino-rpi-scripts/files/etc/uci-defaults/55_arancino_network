@@ -35,4 +35,5 @@ disable_ipv6_sysctl_conf() {
 }
 
 set_network_interface
+disable_ipv6_sysctl_conf
 exit 0
