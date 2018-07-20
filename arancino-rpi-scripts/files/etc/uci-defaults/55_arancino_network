@@ -26,7 +26,6 @@ set_network_interface() {
 	uci set network.wwan.metric='20'
 	uci set network.wwan.dns='8.8.8.8, 8.8.4.4'
 	uci commit network
-	exit 0
 }
 
 disable_ipv6_sysctl_conf() {
