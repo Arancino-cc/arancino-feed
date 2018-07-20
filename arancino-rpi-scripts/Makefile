@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=21
+PKG_RELEASE:=22
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -45,7 +45,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config/wireless
 	$(INSTALL_CONF) ./files/etc/config/smartme $(1)/etc/config
 
-	$(INSTALL_DATA) ./files/etc/opkg/customfeeds.conf $(1)/etc/opkg/customfeeds.conf
+	#$(INSTALL_DATA) ./files/etc/opkg/customfeeds.conf $(1)/etc/opkg/customfeeds.conf
 
 	# /usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/smartme-wifi-connect $(1)/usr/bin
@@ -60,6 +60,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/etc/init.d/handle_wifi_reset $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/can-setup $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/node-red $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/etc/init.d/ttyMAX $(1)/etc/init.d
 
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/hotplug.d/usb/21-ftdi-usb $(1)/etc/hotplug.d/usb
