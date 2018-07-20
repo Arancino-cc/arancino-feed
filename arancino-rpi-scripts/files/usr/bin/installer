@@ -40,7 +40,7 @@ returngigs () {
 
 	  then
 
-	    sizetoformat=+'30000MB'
+	    sizetoformat=+'2.1GB'
 	    #echo "Size partition: $sizetoformat"
 	    return 0
 
@@ -48,7 +48,7 @@ returngigs () {
 
 	  then
 
-	    sizetoformat=+'30500MB'
+	    sizetoformat=+'2.1GB'
 	    return 0
 
 
@@ -155,7 +155,8 @@ formatssd () {
         echo ""
 
         (echo n; echo p; echo 1; echo ;echo $1; echo w) | fdisk /dev/sda
-        (echo n; echo p; echo 2; echo ;echo ; echo w) | fdisk /dev/sda
+        (echo n; echo p; echo 2; echo ;echo $1; echo w) | fdisk /dev/sda
+        (echo n; echo p; echo 3; echo ;echo ; echo w) | fdisk /dev/sda
 
         partx -u /dev/sda
 
@@ -178,6 +179,15 @@ formatssd () {
         echo ""
 
 	mkfs.f2fs -l driveSSD-02 /dev/sda2
+
+        sleep 10
+
+        echo ""
+        echo "Formatting partition 03..."
+        echo ""
+
+        mkfs.f2fs -l driveSSD-03 /dev/sda3
+
 }
 
 formatsdcard () {
@@ -345,6 +355,7 @@ fstaboverlay () {
 
 uuid1=`blkid | grep "driveSSD-01" | awk {'print $3'} | sed 's/UUID=//g' | sed -e 's/'\"'/'\''/g'`
 uuid2=`blkid | grep "driveSSD-02" | awk {'print $3'} | sed 's/UUID=//g' | sed -e 's/'\"'/'\''/g'`
+uuid3=`blkid | grep "driveSSD-03" | awk {'print $3'} | sed 's/UUID=//g' | sed -e 's/'\"'/'\''/g'`
 #Inserts the mount points in /etc/config/fstab
 cat <<EOF
 
@@ -359,8 +370,14 @@ config 'mount'
 
 config 'mount'
         option  target  '/mnt/sda2'
-        option  uuid    'a7a96f23-5945-46b4-b287-2c0f93ed1682'
-        option  enabled '0'
+        option  uuid    $uuid2
+        option  enabled '1'
+
+config 'mount'
+        option  target  '/data'
+        option  uuid    $uuid3
+        option  enabled '1'
+        option  options rw,sync
 
 #endoverlayconfig
 EOF
@@ -478,10 +495,10 @@ alignSDCard () {
 }
 
 initialize_configure () {
-	echo ""
-	prereqs
-
-	sleep 2
+	#echo ""
+	#prereqs
+	
+	#sleep 2
 
 	echo ""
 	echo "Erasing all data..."
@@ -514,7 +531,7 @@ initialize_configure () {
 	echo "Rebooting....."
 	echo ""
 
-	reboot && exit
+	reboot -f && exit
 }
 
 revert () {
