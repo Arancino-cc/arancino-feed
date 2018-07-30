@@ -7,14 +7,14 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.1.2
-PKG_RELEASE:=15
-PKG_MD5SUM:=d32dca94a2675bd958668f42c2666c1d4b32166c
+PKG_VERSION:=2.2.0
+PKG_RELEASE:=6
+PKG_MD5SUM:=d11f7c7ff11d6085ad3b413c87e664ab237881e0
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/MDSLab/s4t-lightning-rod.git
-PKG_REV:=release-v2.1.2
+PKG_REV:=release-v2.2.0
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_REV)
 #PKG_SOURCE_VERSION:=7b18982d5b4b279439d904daa29759cde958b37e
@@ -104,6 +104,16 @@ else
 	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/modules/drivers-manager/drivers.example.json $${IPKG_INSTROOT}/var/lib/iotronic/drivers/drivers.json
 fi
 
+if [ -e $${IPKG_INSTROOT}/etc/iotronic/authentication.json ]
+then
+	# set the new default password
+	logger -t DEBUG "Authentication settings file already present"
+else
+	logger -t DEBUG "Authentication settings file missing. Added..."
+   	mkdir -p $${IPKG_INSTROOT}/etc/iotronic/
+    	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/templates/authentication.example.json $${IPKG_INSTROOT}/etc/iotronic/authentication.json
+fi
+
 if [ "`grep IOTRONIC_HOME $${IPKG_INSTROOT}/etc/profile`" == "" ]
 then
         # Configure Profile
@@ -132,7 +142,7 @@ else
 
 fi
 
-if [ $${IPKG_INSTROOT} == "" ]
+if [ "$${IPKG_INSTROOT}/" == "/" ]
 then 
 	echo "Lightning-rod starting..."
 	/etc/init.d/lightning-rod restart
