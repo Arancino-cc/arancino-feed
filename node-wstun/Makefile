@@ -6,14 +6,14 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=wstun
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=1.0.5
+PKG_VERSION:=1.0.7
 PKG_RELEASE:=1
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/MDSLab/wstun.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=6565ce202412fee8144705d52ec494b21bd28f94
+PKG_SOURCE_VERSION:=e6bdb6d14fde197a74d1f97d3d99c1b00dd2c615
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
 
@@ -61,6 +61,7 @@ endef
 define Package/node-wstun/install
 	$(INSTALL_DIR) $(1)/usr/lib/node_modules/$(PKG_ORG)
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME) $(1)/usr/lib/node_modules/$(PKG_ORG)
+	mkdir -p $(1)/var/log/wstun
 endef
 
 $(eval $(call BuildPackage,node-wstun))
