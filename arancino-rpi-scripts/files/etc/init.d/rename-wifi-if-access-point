@@ -4,7 +4,7 @@
 START=18
 
 start() {
-
+	echo "Renaming WiFi..."
 	#boardname=$(awk '/machine/ {print tolower($4)}' /proc/cpuinfo)
 
 	MODE=`/sbin/uci get wireless.@wifi-iface[0].mode`

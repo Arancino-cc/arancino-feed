@@ -18,7 +18,7 @@ set_or_delete() {
 
 start() {
 	/bin/sleep 5
-
+	echo "Handle WiFi reset..."
 	STEP=`$UCI get "smartme.@smartme[0].wifi_reset_step"`
 	logger -t "$0" "WiFi step is $STEP"
 

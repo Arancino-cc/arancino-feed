@@ -15,7 +15,8 @@ start() {
                 chown $USER:$USER $LOG
                 echo "" >> $LOG
                 echo "Node-RED service start: "$(date) >> $LOG
-                su -l $USER -c "node-red-pi --max-old-space-size=128 -u ~/.node-red >> $LOG &"
+                #su -l $USER -c "node-red-pi --max-old-space-size=128 -u ~/.node-red >> $LOG &"
+                node-red-pi --max-old-space-size=128 -u ~/.node-red >> $LOG &
         fi
 }
 
