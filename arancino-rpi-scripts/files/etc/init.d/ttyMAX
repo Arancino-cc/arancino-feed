@@ -1,0 +1,28 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2008 OpenWrt.org
+
+START=99
+USER=root
+
+start() {
+        if [ -e /dev/ttyMAX0 ]; then
+                logger -t DEBUG "Find MAX0 device start getty"
+                /sbin/getty -L ttyMAX0 115200 vt102 &
+        else                         
+                logger -t DEBUG "MAX0 device doesn't exist"
+        fi                                                                   
+}
+
+
+stop() {
+        echo "Stopping getty.."
+        pkill -SIGINT ^getty$
+}
+
+restart() {
+        echo "Restarting getty..."
+        stop
+        sleep 2
+        start
+}
+
