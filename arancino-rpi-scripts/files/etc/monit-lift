@@ -1,0 +1,17 @@
+check process mosquitto
+       matching "mosquitto"
+        start program = "/etc/init.d/mosquitto start"
+        stop program = "/usr/bin/killall mosquitto"
+
+check process lightning-rod
+      matching "lightning-rod.js"
+        start program = "/etc/init.d/lightning-rod start"
+        stop program = "/usr/bin/killall lightning-rod"
+~
+check process node-red
+	matching "node-red"
+       start program = "/etc/init.d/node-red start"
+       stop program = "/etc/init.d/node-red stop"
+       if failed host 127.0.0.1 port 1880
+       then restart
+
