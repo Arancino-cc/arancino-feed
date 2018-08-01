@@ -8,8 +8,8 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.2.0
-PKG_RELEASE:=6
-PKG_MD5SUM:=d11f7c7ff11d6085ad3b413c87e664ab237881e0
+PKG_RELEASE:=10
+PKG_MD5SUM:=051f8d76a944164f9b89ba1d9daa05b1b74db96d
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
@@ -84,10 +84,10 @@ define Package/node-iotronic-lightning-rod/install
 	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 
 	# configure init.d 
-	mkdir -p $(1)/etc/init.d/
-	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/init.d/s4t-lightning-rod_openwrt $(1)/etc/init.d/lightning-rod
-	sed -i "s/<LIGHTNINGROD_HOME>/export LIGHTNINGROD_HOME=\/usr\/lib\/node_modules\/@mdslab\/iotronic-lightning-rod/g" $(1)/etc/init.d/lightning-rod
-	chmod +x $(1)/etc/init.d/lightning-rod
+	#mkdir -p $(1)/etc/init.d/
+	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/init.d/s4t-lightning-rod_openwrt $(1)/etc/init.d/lightning-rod
+	#sed -i "s/<LIGHTNINGROD_HOME>/export LIGHTNINGROD_HOME=\/usr\/lib\/node_modules\/@mdslab\/iotronic-lightning-rod/g" $(1)/etc/init.d/lightning-rod
+	#chmod +x $(1)/etc/init.d/lightning-rod
 
 endef
 
@@ -140,12 +140,6 @@ then
 else
         echo "Cron already configured"
 
-fi
-
-if [ "$${IPKG_INSTROOT}/" == "/" ]
-then 
-	echo "Lightning-rod starting..."
-	/etc/init.d/lightning-rod restart
 fi
 
 exit 0
