@@ -377,7 +377,7 @@ config 'mount'
         option  target  '/data'
         option  uuid    $uuid3
         option  enabled '1'
-        option  options rw,sync
+        option  options rw,async
 
 #endoverlayconfig
 EOF
