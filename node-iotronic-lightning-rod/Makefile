@@ -8,8 +8,8 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.2.0
-PKG_RELEASE:=10
-PKG_MD5SUM:=051f8d76a944164f9b89ba1d9daa05b1b74db96d
+PKG_RELEASE:=12
+PKG_MD5SUM:=5df3fc8418a29e3cacd5acaf169b0d118027b7be
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
@@ -99,7 +99,7 @@ then
 	logger -t DEBUG "Settings file already present"
 else
 	logger -t DEBUG "Settings file missing. Add a default one $${PKG_ORG}/$${PKG_NPM_NAME}"
-	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/settings.example.json $${IPKG_INSTROOT}/var/lib/iotronic/settings.json
+	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/templates/settings.example.json $${IPKG_INSTROOT}/var/lib/iotronic/settings.json
 	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/modules/plugins-manager/plugins.example.json $${IPKG_INSTROOT}/var/lib/iotronic/plugins/plugins.json
 	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/modules/drivers-manager/drivers.example.json $${IPKG_INSTROOT}/var/lib/iotronic/drivers/drivers.json
 fi
