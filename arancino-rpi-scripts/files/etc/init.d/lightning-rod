@@ -27,7 +27,7 @@ boot () {
 
 start () {
 
-        pid=`ps www | grep lightning-rod.js | grep -v grep | awk {'print $1'}`
+        pid=`ps aux | grep lightning-rod.js | grep -v grep | awk {'print $1'}`
 
         if [ -r $pid ]; then
 		if [ -e $LIGHTNINGROD_HOME/lightning-rod.js ]; then
@@ -43,9 +43,9 @@ start () {
 }
 
 stop () {
-        kill -9 `ps www | grep wstun.js | grep -v grep | awk {'print $1'}` > /dev/null 2>&1
+        kill -9 `ps aux | grep wstun.js | grep -v grep | awk {'print $1'}` > /dev/null 2>&1
         echo "WSTUN processes stopped"
-        kill -9 `ps www | grep lightning-rod.js | grep -v grep | awk {'print $1'}` > /dev/null 2>&1
+        kill -9 `ps aux | grep lightning-rod.js | grep -v grep | awk {'print $1'}` > /dev/null 2>&1
         echo "Lightning-rod is stopped"
 }
 
