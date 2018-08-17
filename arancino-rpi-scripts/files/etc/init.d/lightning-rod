@@ -15,6 +15,8 @@ export NODE_PATH=/usr/lib/node_modules:/usr/lib/node_modules:$NODE_PATH
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 export IOTRONIC_HOME=/var/lib/iotronic
 export LIGHTNINGROD_HOME=/usr/lib/node_modules/@mdslab/iotronic-lightning-rod
+export LIGHTNINGROD_REGEX='lightning-rod.js'
+export WSTUN_REGEX='wstun.js'
 
 START=99
 STOP=99
@@ -27,15 +29,15 @@ boot () {
 
 start () {
 
-        pid=`ps aux | grep lightning-rod.js | grep -v grep | awk {'print $1'}`
+        pid=`pgrep -f "${LIGHTNINGROD_REGEX}"`
 
         if [ -r $pid ]; then
-		if [ -e $LIGHTNINGROD_HOME/lightning-rod.js ]; then
-                	node $LIGHTNINGROD_HOME/lightning-rod.js >> /dev/null & # /var/log/iotronic/lightning-rod.log &
-                	echo "Lightning-rod is started"
-		else
-			echo "Lightining-rod not installed"
-		fi
+            if [ -e $LIGHTNINGROD_HOME/lightning-rod.js ]; then
+                node $LIGHTNINGROD_HOME/lightning-rod.js >> /dev/null & # /var/log/iotronic/lightning-rod.log &
+                echo "Lightning-rod has been started"
+            else
+                echo "Lightining-rod not installed"
+            fi
         else
                 echo "Lightning-rod is already started with PID $pid"
         fi
@@ -43,10 +45,17 @@ start () {
 }
 
 stop () {
-        kill -9 `ps aux | grep wstun.js | grep -v grep | awk {'print $1'}` > /dev/null 2>&1
-        echo "WSTUN processes stopped"
-        kill -9 `ps aux | grep lightning-rod.js | grep -v grep | awk {'print $1'}` > /dev/null 2>&1
-        echo "Lightning-rod is stopped"
+        if pkill -9 -f "${WSTUN_REGEX}"; then
+            echo "WSTUN processes have been stopped"
+        else
+            echo "WSTUN processes was already stopped"
+        fi
+
+        if pkill -9 -f "${LIGHTNINGROD_REGEX}"; then
+            echo "Lightning-rod has been stopped"
+        else
+            echo "Lightning-rod was already stopped"
+        fi
 }
 
 restart () {
