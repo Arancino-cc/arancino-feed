@@ -8,7 +8,7 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.2.0
-PKG_RELEASE:=12
+PKG_RELEASE:=13
 PKG_MD5SUM:=5df3fc8418a29e3cacd5acaf169b0d118027b7be
 PKG_ORG:=@mdslab
 
@@ -133,14 +133,19 @@ else
         echo "Environment already configured"
 fi
 
-if [ "`grep $${IPKG_INSTROOT}/etc/init.d/lightning-rod $${IPKG_INSTROOT}/etc/crontabs/root`" == "" ]
-then
-        cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/etc/cron.d/root_openwrt $${IPKG_INSTROOT}/etc/crontabs/root
-        echo "Cron configured."
-else
-        echo "Cron already configured"
-
+mkdir -p $${IPKG_INSTROOT}/etc/crontabs
+if ! grep -q "lightning-rod.log" $${IPKG_INSTROOT}/etc/crontabs/root; then
+	echo "Logrotate configured in cron"
+	echo $$'\n'"0 0 * * 0 /usr/sbin/logrotate /etc/logrotate.d/lightning-rod.log" >>$${IPKG_INSTROOT}/etc/crontabs/root; 
 fi
+
+#if [ "`grep $${IPKG_INSTROOT}/etc/init.d/lightning-rod $${IPKG_INSTROOT}/etc/crontabs/root`" == "" ]
+#then
+#        cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/etc/cron.d/root_openwrt $${IPKG_INSTROOT}/etc/crontabs/root
+#        echo "Cron configured."
+#else
+#        echo "Cron already configured"
+#fi
 
 exit 0
 endef
