@@ -568,6 +568,7 @@ revert () {
 
 #--------------------------------MENU-START----------------------------------------
 
+size=`fdisk -l | grep "Disk /dev/sda" | awk {'print $5'}`
 if ([ "$1" == "-i" ])
 then
 
@@ -751,7 +752,7 @@ then
 
 	done
 
-elif ( `block info | grep -qs '/dev/sda'` && returngigs ) && [ -z $1 ]
+elif [ $size -gt 100000000 ] || (( `block info | grep -qs '/dev/sda'` && returngigs ) && [ -z $1 ] )
 then
 
 	welcome
