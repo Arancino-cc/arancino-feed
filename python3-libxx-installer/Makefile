@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python3-libxx-installer
 PKG_VERSION:=1.0
-PKG_RELEASE:=5
+PKG_RELEASE:=8
 
 include $(INCLUDE_DIR)/package.mk
 include $(TOPDIR)/feeds/packages/lang/python/python3-package.mk
@@ -35,6 +35,7 @@ define Package/$(PKG_NAME)/install
 	tar xzvf ./files/tar/python3.6-pandas-0.23-1.tar.gz -C $(1)$(PYTHON3_PKG_DIR)/
 	tar xzvf ./files/tar/python3.6-pytz-2018.4.tar.gz -C $(1)$(PYTHON3_PKG_DIR)/
 	tar xzvf ./files/tar/python3.6-dateutil.tar.gz -C $(1)$(PYTHON3_PKG_DIR)/
+	tar xzvf ./files/tar/python3-server-lib.tar.gz -C $(1)$(PYTHON3_PKG_DIR)/
 
 	find $(1)$(PYTHON3_PKG_DIR) -name "*.pyc" -delete
 	$(LN) $(1)/usr/lib/libtinfo.so.5 $(1)/usr/lib/libtinfo.so
