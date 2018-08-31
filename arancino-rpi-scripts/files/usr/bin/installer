@@ -448,7 +448,8 @@ systemoverlay () {
 	cp /etc/config/fstab /etc/config/fstab_bak
 
 	#Deleting tab and trailing spaces
-	fstabclean
+	#fstabclean
+	removePrevMount
 
 	sleep 2
 
@@ -511,6 +512,9 @@ initialize_configure () {
 	formatssd $sizetoformat
 
 	sleep 5
+	
+	#Kill process that write on the disk
+	killprocesses
 
 	#Updates the system settings
 	systemoverlay
@@ -564,6 +568,24 @@ revert () {
 
 	reboot && exit
 
+}
+
+killprocesses () {
+	echo ""                                                                                            
+        echo "Killing process before start..."                                                              
+        echo ""    
+	pkill monit
+	pkill influxd
+	pkill mosquitto
+	pkill node-red
+}
+
+removePrevMount () {
+	if (`grep -qs 'startoverlayconfig' /etc/config/fstab`)
+        then  	
+		sed '/#startoverlayconfig/,/#endoverlayconfig/d' /etc/config/fstab > /etc/config/fstab.new
+		mv /etc/config/fstab.new /etc/config/fstab
+	fi
 }
 
 #--------------------------------MENU-START----------------------------------------
