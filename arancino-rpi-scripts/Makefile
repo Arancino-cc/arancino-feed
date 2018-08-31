@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=28
+PKG_RELEASE:=29
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -61,7 +61,7 @@ define Package/arancino-rpi-scripts/install
 	#$(INSTALL_BIN) ./files/etc/init.d/generate_new_gpg_key $(1)/etc/init.d
 	#$(INSTALL_BIN) ./files/etc/init.d/handle_wifi_reset $(1)/etc/init.d
 	#$(INSTALL_BIN) ./files/etc/init.d/can-setup $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/etc/init.d/node-red $(1)/etc/init.d
+	#$(INSTALL_BIN) ./files/etc/init.d/node-red $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/ttyMAX $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/lightning-rod $(1)/etc/init.d
 
