@@ -1,0 +1,4 @@
+check process mosquitto
+       matching "mosquitto"
+        start program = "/etc/init.d/mosquitto start"
+        stop program = "/usr/bin/killall mosquitto"
