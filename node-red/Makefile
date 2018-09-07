@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=node-red
 PKG_NAME:=node-red
 PKG_VERSION:=0.18.7
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
@@ -63,6 +63,9 @@ define Package/node-red/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(LN) ../lib/node_modules/node-red/red.js $(1)/usr/bin/node-red
 	$(LN) ../lib/node_modules/node-red/bin/node-red-pi $(1)/usr/bin/node-red-pi
+
+	$(INSTALL_DIR) $(1)/etc/monit.d
+	$(CP) ./files/etc/monit.d/* $(1)/etc/monit.d
 endef
 
 define Package/$(PKG_NAME)/postrm
