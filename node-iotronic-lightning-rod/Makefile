@@ -8,8 +8,8 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.2.0
-PKG_RELEASE:=14
-PKG_MD5SUM:=0a7005c8abf809b813b2435b554ff28c7917d83a
+PKG_RELEASE:=15
+PKG_MD5SUM:=4d919710ad226d6a9584ada91c3bf1503d3d5746
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
@@ -89,6 +89,9 @@ define Package/node-iotronic-lightning-rod/install
 	#sed -i "s/<LIGHTNINGROD_HOME>/export LIGHTNINGROD_HOME=\/usr\/lib\/node_modules\/@mdslab\/iotronic-lightning-rod/g" $(1)/etc/init.d/lightning-rod
 	#chmod +x $(1)/etc/init.d/lightning-rod
 
+	# configure monit
+	$(INSTALL_DIR) $(1)/etc/monit.d
+	$(CP) ./files/etc/monit.d/* $(1)/etc/monit.d
 endef
 
 define Package/node-iotronic-lightning-rod/postinst
