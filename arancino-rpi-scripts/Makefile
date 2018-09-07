@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=29
+PKG_RELEASE:=30
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -29,11 +29,13 @@ define Build/Compile
 	# NOOP
 endef
 
+
 define Package/arancino-rpi-scripts/install
 	$(INSTALL_DIR) $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/etc/init-cfg
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/usb
 	$(INSTALL_DIR) $(1)/etc/opkg
 	$(INSTALL_DIR) $(1)/etc/monit.d
@@ -45,7 +47,7 @@ define Package/arancino-rpi-scripts/install
 	# /etc/config DIR
 	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config/wireless
 	$(INSTALL_CONF) ./files/etc/config/smartme $(1)/etc/config
-	$(INSTALL_CONF) ./files/etc/monit-lift $(1)/etc/monit.d
+	$(CP) ./files/etc/monit.d/* $(1)/etc/monit.d
 
 	#$(INSTALL_DATA) ./files/etc/opkg/customfeeds.conf $(1)/etc/opkg/customfeeds.conf
 
@@ -58,12 +60,11 @@ define Package/arancino-rpi-scripts/install
 
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
-	#$(INSTALL_BIN) ./files/etc/init.d/generate_new_gpg_key $(1)/etc/init.d
-	#$(INSTALL_BIN) ./files/etc/init.d/handle_wifi_reset $(1)/etc/init.d
-	#$(INSTALL_BIN) ./files/etc/init.d/can-setup $(1)/etc/init.d
-	#$(INSTALL_BIN) ./files/etc/init.d/node-red $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/ttyMAX $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/etc/init.d/lightning-rod $(1)/etc/init.d
+
+	# /etc/init-cfg
+	$(INSTALL_BIN) ./files/etc/init-cfg/lightning-rod $(1)/etc/init-cfg
+	#$(INSTALL_BIN) ./files/etc/init-cfg/node-red $(1)/etc/init-cfg
 
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/hotplug.d/usb/21-ftdi-usb $(1)/etc/hotplug.d/usb
@@ -87,7 +88,7 @@ then
 fi 
 
 mkdir -p $${IPKG_INSTROOT}/etc/crontabs
-if ! grep -q hwclock $${IPKG_INSTROOT}/etc/crontabs/root; then echo $$'\n'"* */1 * * * hwclock -w" >>$${IPKG_INSTROOT}/etc/crontabs/root; fi
+if ! grep -q hwclock $${IPKG_INSTROOT}/etc/crontabs/root; then echo $$'\n'"*/1 * * * * hwclock -w" >>$${IPKG_INSTROOT}/etc/crontabs/root; fi
 
 if ! grep -q procps-ng-ps $${IPKG_INSTROOT}/etc/profile; then echo "alias ps='procps-ng-ps'" >>$${IPKG_INSTROOT}/etc/profile; fi
 if ! grep -q procps-ng-top $${IPKG_INSTROOT}/etc/profile; then echo "alias top='procps-ng-top'" >>$${IPKG_INSTROOT}/etc/profile; fi
