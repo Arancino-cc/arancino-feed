@@ -6,4 +6,9 @@
 uci set system.@system[0].firmware_version=v0.0.1
 # uci set system.@system[0].loader_version=v${LDR_VER}
 uci set system.@system[0].arancino_firstboot=1
+
+uci set system.@system[0].log_file=/var/log/messages
+uci set system.@system[0].log_size=1024
+uci set system.@system[0].log_type=file
+
 uci commit system
