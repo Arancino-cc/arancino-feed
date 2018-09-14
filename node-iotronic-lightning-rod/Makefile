@@ -7,17 +7,16 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.2.0
-PKG_RELEASE:=15
-PKG_MD5SUM:=4d919710ad226d6a9584ada91c3bf1503d3d5746
+PKG_VERSION:=2.3.0
+PKG_RELEASE:=1
+PKG_MD5SUM:=612b7c4ad0ca20bf8bab776eb4692b65c2f9a1a9
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/MDSLab/s4t-lightning-rod.git
-PKG_REV:=release-v2.2.0
+PKG_REV:=release-v2.3.0
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_REV)
-#PKG_SOURCE_VERSION:=7b18982d5b4b279439d904daa29759cde958b37e
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
 PKG_BUILD_DEPENDS:=node libc libpthread
@@ -32,7 +31,7 @@ define Package/node-iotronic-lightning-rod
   CATEGORY:=Languages
   TITLE:=Stack4Things Lightning-rod
   URL:=https://www.npmjs.org/package/iotronic-lightning-rod
-  DEPENDS:=+node +libfuse +libpthread +libc
+  DEPENDS:=+node +libfuse +libpthread +libc +gdb +node-lsof
 endef
 
 define Package/node-iotronic-lightning-rod/description
