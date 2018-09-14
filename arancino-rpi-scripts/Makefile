@@ -88,7 +88,7 @@ then
 fi 
 
 mkdir -p $${IPKG_INSTROOT}/etc/crontabs
-if ! grep -q hwclock $${IPKG_INSTROOT}/etc/crontabs/root; then echo $$'\n'"*/1 * * * * hwclock -w" >>$${IPKG_INSTROOT}/etc/crontabs/root; fi
+if ! grep -q hwclock $${IPKG_INSTROOT}/etc/crontabs/root; then echo $$'\n'"* */1 * * * hwclock -w" >>$${IPKG_INSTROOT}/etc/crontabs/root; fi
 
 if ! grep -q procps-ng-ps $${IPKG_INSTROOT}/etc/profile; then echo "alias ps='procps-ng-ps'" >>$${IPKG_INSTROOT}/etc/profile; fi
 if ! grep -q procps-ng-top $${IPKG_INSTROOT}/etc/profile; then echo "alias top='procps-ng-top'" >>$${IPKG_INSTROOT}/etc/profile; fi
