@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=30
+PKG_RELEASE:=31
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -37,6 +37,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_DIR) $(1)/etc/init-cfg
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/usb
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/ntp
 	$(INSTALL_DIR) $(1)/etc/opkg
 	$(INSTALL_DIR) $(1)/etc/monit.d
 	#$(INSTALL_DIR) $(1)/etc/smartme
@@ -68,6 +69,7 @@ define Package/arancino-rpi-scripts/install
 
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/hotplug.d/usb/21-ftdi-usb $(1)/etc/hotplug.d/usb
+	$(INSTALL_BIN) ./files/etc/hotplug.d/ntp/30-update-clock $(1)/etc/hotplug.d/ntp
 	
 
 	$(CP) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
@@ -87,8 +89,8 @@ then
 	echo dtoverlay=scs-max3107-spi0 >> $${IPKG_INSTROOT}/boot/config.txt
 fi 
 
-mkdir -p $${IPKG_INSTROOT}/etc/crontabs
-if ! grep -q hwclock $${IPKG_INSTROOT}/etc/crontabs/root; then echo $$'\n'"* */1 * * * hwclock -w" >>$${IPKG_INSTROOT}/etc/crontabs/root; fi
+#mkdir -p $${IPKG_INSTROOT}/etc/crontabs
+#if ! grep -q hwclock $${IPKG_INSTROOT}/etc/crontabs/root; then echo $$'\n'"* */1 * * * hwclock -w" >>$${IPKG_INSTROOT}/etc/crontabs/root; fi
 
 if ! grep -q procps-ng-ps $${IPKG_INSTROOT}/etc/profile; then echo "alias ps='procps-ng-ps'" >>$${IPKG_INSTROOT}/etc/profile; fi
 if ! grep -q procps-ng-top $${IPKG_INSTROOT}/etc/profile; then echo "alias top='procps-ng-top'" >>$${IPKG_INSTROOT}/etc/profile; fi

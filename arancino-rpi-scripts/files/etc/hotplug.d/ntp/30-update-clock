@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Uncomment for debug
+#logger -t DEBUG "hotplug ntp: action='$ACTION' stratum='$stratum' offset='$offset' poll_interval='$poll_interval'"
+
+if [ "$ACTION" = "unsync" ]
+then
+        logger -t DEBUG "hotplug ntp ($ACTION): update system from hwclock"
+        hwclock -s
+fi
+
+if [ "$ACTION" = "periodic" ]
+then
+        if [ $stratum -gt 15 ] 
+        then
+                logger -t DEBUG "hotplug ntp ($ACTION): update system from hwclock"
+                hwclock -s
+        else
+                hwclock -w                                           
+                # logger -t DEBUG "hotplug ntp ($ACTION): update hwclock from ntp server" 
+        fi
+fi
+
+if [ "$ACTION" = "stratum" ] 
+then
+        hwclock -w 
+        logger -t DEBUG "hotplug ntp ($ACTION): update hwclock from ntp server"
+fi
