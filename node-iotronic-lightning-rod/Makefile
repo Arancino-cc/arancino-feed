@@ -70,10 +70,6 @@ define Package/node-iotronic-lightning-rod/install
 	mkdir -p $(1)/var/lib/iotronic/
 	mkdir -p $(1)/var/lib/iotronic/plugins
 	mkdir -p $(1)/var/lib/iotronic/drivers
-
-	# Manage Lightning-rod patches
-	mkdir -p $(1)/var/lib/iotronic/patches
-	$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
 	
 	
 	# Not overwrite settings.json
@@ -100,6 +96,10 @@ endef
 
 define Package/node-iotronic-lightning-rod/preinst
 #!/bin/sh
+
+# Manage Lightning-rod patches
+mkdir -p $(1)/var/lib/iotronic/patches
+$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
 
 if [ -e $${IPKG_INSTROOT}/etc/iotronic/authentication.json ]
 then
