@@ -71,6 +71,9 @@ define Package/node-iotronic-lightning-rod/install
 	mkdir -p $(1)/var/lib/iotronic/plugins
 	mkdir -p $(1)/var/lib/iotronic/drivers
 	
+	# Manage Lightning-rod patches
+	#mkdir -p $(1)/var/lib/iotronic/patches
+	$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
 	
 	# Not overwrite settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/settings.example.json $(1)/var/lib/iotronic/settings.json
@@ -99,25 +102,7 @@ define Package/node-iotronic-lightning-rod/preinst
 
 # Manage Lightning-rod patches
 mkdir -p $(1)/var/lib/iotronic/patches
-$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
-
-if [ -e $${IPKG_INSTROOT}/etc/iotronic/authentication.json ]
-then
-        LR_INSTALLED_VERSION=`cat /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/package.json | grep \"version\" | awk '{print $$2}' | tr -d , | tr -d \"`
-        # set the new default password
-        logger -t DEBUG "Authentication settings file already present ver: $${LR_INSTALLED_VERSION}"
-
-        if [ "$${LR_INSTALLED_VERSION}" == "2.2.0" ]; then
-                        logger -t DEBUG "APPLY THE 2.3.0 PATCH"
-                        patch /etc/iotronic/authentication.json /var/lib/iotronic/patches/authentication.patch
-                        rm -rf /var/lib/iotronic/patches/
-        fi
-
-else
-        logger -t DEBUG "Authentication settings file missing. Added..."
-        mkdir -p $${IPKG_INSTROOT}/etc/iotronic/
-        cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/templates/authentication.example.json $${IPKG_INSTROOT}/etc/iotronic/authentication.json
-fi
+$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/package.json $(1)/var/lib/iotronic/patches/package.json
 
 exit 0
 endef
@@ -134,6 +119,26 @@ else
 	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/modules/plugins-manager/plugins.example.json $${IPKG_INSTROOT}/var/lib/iotronic/plugins/plugins.json
 	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/modules/drivers-manager/drivers.example.json $${IPKG_INSTROOT}/var/lib/iotronic/drivers/drivers.json
 fi
+
+
+if [ -e $${IPKG_INSTROOT}/etc/iotronic/authentication.json ]
+then
+        LR_INSTALLED_VERSION=`cat /var/lib/iotronic/patches/package.json | grep \"version\" | awk '{print $$2}' | tr -d , | tr -d \"`
+        # set the new default password
+        logger -t DEBUG "Authentication settings file already present ver: $${LR_INSTALLED_VERSION}"
+
+        if [ "$${LR_INSTALLED_VERSION}" == "2.2.0" ]; then
+                        logger -t DEBUG "APPLY THE 2.3.0 PATCH"
+                        patch /etc/iotronic/authentication.json /var/lib/iotronic/patches/authentication.patch
+                        rm -rf /var/lib/iotronic/patches/
+	fi
+
+else
+        logger -t DEBUG "Authentication settings file missing. Added..."
+        mkdir -p $${IPKG_INSTROOT}/etc/iotronic/
+        cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/templates/authentication.example.json $${IPKG_INSTROOT}/etc/iotronic/authentication.json
+fi
+
 
 if [ "`grep IOTRONIC_HOME $${IPKG_INSTROOT}/etc/profile`" == "" ]
 then
