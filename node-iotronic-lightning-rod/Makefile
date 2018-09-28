@@ -72,7 +72,7 @@ define Package/node-iotronic-lightning-rod/install
 	mkdir -p $(1)/var/lib/iotronic/drivers
 	
 	# Manage Lightning-rod patches
-	#mkdir -p $(1)/var/lib/iotronic/patches
+	mkdir -p $(1)/var/lib/iotronic/patches
 	$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
 	
 	# Not overwrite settings.json
@@ -101,9 +101,11 @@ define Package/node-iotronic-lightning-rod/preinst
 #!/bin/sh
 
 # Manage Lightning-rod patches
-mkdir -p $(1)/var/lib/iotronic/patches
-$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/package.json $(1)/var/lib/iotronic/patches/package.json
-
+mkdir -p $${IPKG_INSTROOT}/var/lib/iotronic/patches
+if [ -e $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/package.json ]
+then
+	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/package.json $${IPKG_INSTROOT}/var/lib/iotronic/patches/package.json
+fi
 exit 0
 endef
 
