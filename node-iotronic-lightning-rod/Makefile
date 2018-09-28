@@ -70,6 +70,11 @@ define Package/node-iotronic-lightning-rod/install
 	mkdir -p $(1)/var/lib/iotronic/
 	mkdir -p $(1)/var/lib/iotronic/plugins
 	mkdir -p $(1)/var/lib/iotronic/drivers
+
+	# Manage Lightning-rod patches
+	mkdir -p $(1)/var/lib/iotronic/patches
+	$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
+	
 	
 	# Not overwrite settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/settings.example.json $(1)/var/lib/iotronic/settings.json
@@ -110,6 +115,13 @@ if [ -e $${IPKG_INSTROOT}/etc/iotronic/authentication.json ]
 then
 	# set the new default password
 	logger -t DEBUG "Authentication settings file already present"
+
+	if [ "$LR_INSTALLED_VERSION" == "2.2.0" ]; then
+			echo "APPLY THE 2.3.0 PATCH"
+			patch /etc/iotronic/authentication.json /var/lib/iotronic/patches/authentication.patch
+			rm -rf /var/lib/iotronic/patches/
+	fi
+
 else
 	logger -t DEBUG "Authentication settings file missing. Added..."
    	mkdir -p $${IPKG_INSTROOT}/etc/iotronic/
