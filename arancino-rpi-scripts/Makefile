@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=31
+PKG_RELEASE:=32
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -35,7 +35,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_DIR) $(1)/etc/init-cfg
+	#$(INSTALL_DIR) $(1)/etc/init-cfg
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/usb
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/ntp
 	$(INSTALL_DIR) $(1)/etc/opkg
@@ -64,7 +64,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/etc/init.d/ttyMAX $(1)/etc/init.d
 
 	# /etc/init-cfg
-	$(INSTALL_BIN) ./files/etc/init-cfg/lightning-rod $(1)/etc/init-cfg
+	#$(INSTALL_BIN) ./files/etc/init-cfg/lightning-rod $(1)/etc/init-cfg
 	#$(INSTALL_BIN) ./files/etc/init-cfg/node-red $(1)/etc/init-cfg
 
 	# /etc/init.d

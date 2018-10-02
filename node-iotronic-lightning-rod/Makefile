@@ -8,8 +8,8 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.3.0
-PKG_RELEASE:=2
-PKG_MD5SUM:=3d267e0af1d88b8170a66864bbf4a302d02114df
+PKG_RELEASE:=4
+PKG_MD5SUM:=2ea7405bc28cdb8606f3233a182ac867cb931033
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
@@ -74,7 +74,9 @@ define Package/node-iotronic-lightning-rod/install
 	# Manage Lightning-rod patches
 	mkdir -p $(1)/var/lib/iotronic/patches
 	$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
-	
+
+	mkdir -p $(1)/usr/bin
+	$(LN) /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/configure_LR_arancino.sh $(1)/usr/bin/configure_LR_arancino
 	# Not overwrite settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/settings.example.json $(1)/var/lib/iotronic/settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/modules/plugins-manager/plugins.example.json $(1)/var/lib/iotronic/plugins/plugins.json
@@ -87,10 +89,11 @@ define Package/node-iotronic-lightning-rod/install
 	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 
 	# configure init.d 
-	#mkdir -p $(1)/etc/init.d/
+	mkdir -p $(1)/etc/init.d/
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/init.d/s4t-lightning-rod_openwrt $(1)/etc/init.d/lightning-rod
 	#sed -i "s/<LIGHTNINGROD_HOME>/export LIGHTNINGROD_HOME=\/usr\/lib\/node_modules\/@mdslab\/iotronic-lightning-rod/g" $(1)/etc/init.d/lightning-rod
-	#chmod +x $(1)/etc/init.d/lightning-rod
+	$(CP) ./files/etc/init.d/lightning-rod $(1)/etc/init.d/lightning-rod
+	chmod +x $(1)/etc/init.d/lightning-rod
 
 	# configure monit
 	$(INSTALL_DIR) $(1)/etc/monit.d
@@ -111,6 +114,13 @@ endef
 
 define Package/node-iotronic-lightning-rod/postinst
 #!/bin/sh
+
+# if on buildroot, make a uci-defaults script which will delete the startup script automatically created
+if [ -n "$${IPKG_INSTROOT}" ]; then
+        echo "Creating uci-default script to disable connectivityservice in factory image"
+        echo "rm -f /etc/rc.d/S99lightning-rod" > $${IPKG_INSTROOT}/etc/uci-defaults/lightning-rod.disable
+fi
+
 if [ -e $${IPKG_INSTROOT}/var/lib/iotronic/settings.json ]
 then
 	# set the new default password
