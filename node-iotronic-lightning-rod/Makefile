@@ -8,12 +8,12 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.3.0
-PKG_RELEASE:=4
-PKG_MD5SUM:=2ea7405bc28cdb8606f3233a182ac867cb931033
+PKG_RELEASE:=6
+PKG_MD5SUM:=8ffe8b97e23a108fde8c27f14a91ab5984da478b
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/MDSLab/s4t-lightning-rod.git
+PKG_SOURCE_URL:=https://github.com/Arancino-cc/s4t-lightning-rod.git
 PKG_REV:=release-v2.3.0
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_REV)
@@ -89,11 +89,8 @@ define Package/node-iotronic-lightning-rod/install
 	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 
 	# configure init.d 
-	mkdir -p $(1)/etc/init.d/
-	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/init.d/s4t-lightning-rod_openwrt $(1)/etc/init.d/lightning-rod
-	#sed -i "s/<LIGHTNINGROD_HOME>/export LIGHTNINGROD_HOME=\/usr\/lib\/node_modules\/@mdslab\/iotronic-lightning-rod/g" $(1)/etc/init.d/lightning-rod
-	$(CP) ./files/etc/init.d/lightning-rod $(1)/etc/init.d/lightning-rod
-	chmod +x $(1)/etc/init.d/lightning-rod
+	$(INSTALL_DIR) $(1)/etc/init-cfg/
+	$(INSTALL_BIN) ./files/etc/init-cfg/lightning-rod $(1)/etc/init-cfg/lightning-rod
 
 	# configure monit
 	$(INSTALL_DIR) $(1)/etc/monit.d
