@@ -1,7 +1,8 @@
 check process node-red
-	matching "node-red"
-       start program = "/etc/init.d/node-red start"
-       stop program = "/etc/init.d/node-red stop"
-       if failed host 127.0.0.1 port 1880
-       then restart
+   matching "node-red"
+	group shm-gw-base-services
+	start program = "/etc/init.d/node-red start"
+	stop program = "/etc/init.d/node-red stop"
+	if failed host 127.0.0.1 port 1880
+	then restart
 
