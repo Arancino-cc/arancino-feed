@@ -6,7 +6,6 @@
 #
 #Copyright (c) 2017 Nicola Peditto
 
-
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin
 export NODEJS=/usr/bin/node
 export LD_LIBRARY_PATH=/usr/lib
@@ -17,6 +16,7 @@ export IOTRONIC_HOME=/var/lib/iotronic
 export LIGHTNINGROD_HOME=/usr/lib/node_modules/@mdslab/iotronic-lightning-rod
 export LIGHTNINGROD_REGEX='lightning-rod.js'
 export WSTUN_REGEX='wstun.js'
+export PYTHONPATH=/opt/shm-gateway/lib
 
 START=99
 STOP=99
@@ -28,7 +28,6 @@ boot () {
 }
 
 start () {
-
         pid=`pgrep -f "${LIGHTNINGROD_REGEX}"`
 
         if [ -r $pid ]; then
