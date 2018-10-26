@@ -21,12 +21,6 @@ export PYTHONPATH=/opt/shm-gateway/lib
 START=99
 STOP=99
 
-boot () {
-
-        #start
-	    echo "LR booting..."
-}
-
 start () {
         pid=`pgrep -f "${LIGHTNINGROD_REGEX}"`
 
