@@ -8,7 +8,7 @@ PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.3.0
-PKG_RELEASE:=11
+PKG_RELEASE:=12
 PKG_MD5SUM:=2fedbebdae2a1389b6efb533e9c4ca424eca85c6
 PKG_ORG:=@mdslab
 
@@ -148,6 +148,11 @@ else
         cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/templates/authentication.example.json $${IPKG_INSTROOT}/etc/iotronic/authentication.json
 fi
 
+if [ -e $${IPKG_INSTROOT}/etc/init.d/lightning-rod ]
+then
+	logger -t DEBUG "Updating init.d/lightning-rod"
+	cp $${IPKG_INSTROOT}/etc/init-cfg/lightning-rod $${IPKG_INSTROOT}/etc/init.d 
+fi
 
 if [ "`grep IOTRONIC_HOME $${IPKG_INSTROOT}/etc/profile`" == "" ]
 then
