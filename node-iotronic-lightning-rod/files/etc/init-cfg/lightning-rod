@@ -17,6 +17,8 @@ export LIGHTNINGROD_HOME=/usr/lib/node_modules/@mdslab/iotronic-lightning-rod
 export LIGHTNINGROD_REGEX='lightning-rod.js'
 export WSTUN_REGEX='wstun.js'
 export PYTHONPATH=/opt/shm-gateway/lib
+export LR_PY_ASYNC_PLUGINS_REGEX='async-wrapper.py'
+export LR_PY_SYNC_PLUGINS_REGEX='sync-wrapper.py'
 
 START=99
 STOP=99
@@ -49,6 +51,16 @@ stop () {
         else
             echo "Lightning-rod was already stopped"
         fi
+
+        if pkill -9 -f "${LR_PY_ASYNC_PLUGINS_REGEX}"; then
+            echo " - Python Async plugins killed!"
+        fi
+
+        if pkill -9 -f "${LR_PY_SYNC_PLUGINS_REGEX}"; then
+            echo "- Python Sync plugins killed!"
+
+        fi
+        
 }
 
 restart () {
