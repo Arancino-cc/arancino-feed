@@ -7,14 +7,14 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.3.0
-PKG_RELEASE:=12
-PKG_MD5SUM:=2fedbebdae2a1389b6efb533e9c4ca424eca85c6
+PKG_VERSION:=2.3.2
+PKG_RELEASE:=1
+PKG_MD5SUM:=b0ac886b4e5493e5f9ecd7177f3825dd3f2125f2
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/Arancino-cc/s4t-lightning-rod.git
-PKG_REV:=release-v2.3.0
+PKG_REV:=release-v2.3.2
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
