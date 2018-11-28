@@ -7,17 +7,17 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=node-red-node-serialport
 PKG_NAME:=node-red-node-serialport
-PKG_VERSION:=0.6.6
+PKG_VERSION:=0.6.8
 PKG_RELEASE:=1
 
-#PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
-#PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
-#PKG_MD5SUM:=0253f67882b9bfc60be5a9c2d32723e1729adedf
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/Arancino-cc/node-red-nodes.git
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=66eaab16cd9f907c4d20e869e9ce981ed0bad574
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
+PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
+PKG_MD5SUM:=0253f67882b9bfc60be5a9c2d32723e1729adedf
+#PKG_SOURCE_PROTO:=git
+#PKG_SOURCE_URL:=https://github.com/Arancino-cc/node-red-nodes.git
+#PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+#PKG_SOURCE_VERSION:=66eaab16cd9f907c4d20e869e9ce981ed0bad574
+#PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
 PKG_BUILD_DEPENDS:=node
 PKG_NODE_VERSION:=6.11.4
