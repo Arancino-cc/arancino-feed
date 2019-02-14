@@ -36,7 +36,7 @@ returngigs () {
 	size=`fdisk -l | grep "Disk /dev/sda" | awk {'print $5'}`
 
 	#echo "Size detected: $size"
-	if [ $size -lt 64500000000 -a $size -gt 63000000000 ]
+	if [ $size -gt 63000000000 ]
 
 	  then
 
