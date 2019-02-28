@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=34
+PKG_RELEASE:=35
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -62,6 +62,7 @@ define Package/arancino-rpi-scripts/install
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/ttyMAX $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/etc/init.d/gpio_conf $(1)/etc/init.d
 
 	# /etc/init-cfg
 	#$(INSTALL_BIN) ./files/etc/init-cfg/lightning-rod $(1)/etc/init-cfg
@@ -94,6 +95,8 @@ fi
 
 if ! grep -q procps-ng-ps $${IPKG_INSTROOT}/etc/profile; then echo "alias ps='procps-ng-ps'" >>$${IPKG_INSTROOT}/etc/profile; fi
 if ! grep -q procps-ng-top $${IPKG_INSTROOT}/etc/profile; then echo "alias top='procps-ng-top'" >>$${IPKG_INSTROOT}/etc/profile; fi
+
+$${IPKG_INSTROOT}/etc/init.d/gpio_conf enable
 
 exit 0
 endef
