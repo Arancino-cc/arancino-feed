@@ -5,19 +5,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=iotronic-lightning-rod
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.3.2
-PKG_RELEASE:=2
-PKG_MD5SUM:=b0ac886b4e5493e5f9ecd7177f3825dd3f2125f2
+PKG_VERSION:=2.3.3
+PKG_RELEASE:=1
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/Arancino-cc/s4t-lightning-rod.git
-PKG_REV:=3a3adb03842f978d121b4d4d1e5ad7f1cbb7052d
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=ssh://git@git.smartme.io:20022/consulting/sacertis/iotronic-lightning-rod.git
+PKG_HASH:=126da93e38fab065fe631dfdf0f58ebfd8fc4231
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=$(PKG_HASH)
 
 PKG_BUILD_DEPENDS:=node libc libpthread
 PKG_NODE_VERSION:=6.11.4
