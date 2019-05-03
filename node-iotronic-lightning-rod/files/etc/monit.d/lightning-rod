@@ -1,5 +1,5 @@
 check process lightning-rod
-      matching "lightning-rod"
+      matching "lightning-rod.js"
 	group shm-gw-base-services
         start program = "/etc/init.d/lightning-rod start"
         stop program = "/usr/bin/killall lightning-rod"
