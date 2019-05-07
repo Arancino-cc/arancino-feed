@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo -e "#############################"
-echo -e "\nstlift_cross_checks v1.2\n"
-echo -e "#############################\n\n\n"
+echo -e "#################################"
+echo -e "\n ST-SmartMe.IO cross-checks v1.3\n"
+echo -e "#################################\n\n\n"
 
 echo "##################"
 echo " PACKAGES STATUS"
@@ -63,14 +63,14 @@ echo -e "\n"
 echo -e "- DataLogger service: HTTP response" `curl -s -H "Content-Type:text/html" -X GET http://localhost:5000/get_summary -o /dev/null -w '%{http_code}\n' -s`
 echo -e "\n"
 
-echo -e "- DataLogger data:"
-files=$(ls -l /data)
-echo -e "--> check 1"
-echo -e "\n$files"
-sleep 2
-echo -e "--> check 2"
-files=$(ls -l /data)
-echo -e "\n$files"
-echo -e "\n"
+#echo -e "- DataLogger data:"
+#files=$(ls -l /data)
+#echo -e "--> check 1"
+#echo -e "\n$files"
+#sleep 2
+#echo -e "--> check 2"
+#files=$(ls -l /data)
+#echo -e "\n$files"
+#echo -e "\n"
 
 echo "TEST COMPLETED"
