@@ -58,6 +58,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/usr/bin/wifi-reload $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/wifi-reset-and-reboot $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/installer $(1)/usr/bin
+	$(INSTALL_BIN) ./files/usr/bin/cross_checks $(1)/usr/bin
 
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
