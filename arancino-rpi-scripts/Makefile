@@ -65,10 +65,6 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/etc/init.d/ttyMAX $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/gpio_conf $(1)/etc/init.d
 
-	# /etc/init-cfg
-	#$(INSTALL_BIN) ./files/etc/init-cfg/lightning-rod $(1)/etc/init-cfg
-	#$(INSTALL_BIN) ./files/etc/init-cfg/node-red $(1)/etc/init-cfg
-
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/hotplug.d/usb/21-ftdi-usb $(1)/etc/hotplug.d/usb
 	$(INSTALL_BIN) ./files/etc/hotplug.d/ntp/30-update-clock $(1)/etc/hotplug.d/ntp
