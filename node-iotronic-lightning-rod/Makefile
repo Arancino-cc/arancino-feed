@@ -13,7 +13,7 @@ PKG_ORG:=@mdslab
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=ssh://git@git.smartme.io:20022/consulting/sacertis/iotronic-lightning-rod.git
-PKG_HASH:=75cd0318d8462d2ebe2824b64daf1f7c2ca6d069
+PKG_HASH:=3b83b27d290779adb2d0276e3fb13c1f9dc70963
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_HASH)
 
