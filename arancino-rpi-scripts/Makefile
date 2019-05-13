@@ -97,6 +97,8 @@ if ! grep -q procps-ng-top $${IPKG_INSTROOT}/etc/profile; then echo "alias top='
 
 $${IPKG_INSTROOT}/etc/init.d/gpio_conf enable
 
+$${IPKG_INSTROOT}/etc/init.d/wdController enable
+
 exit 0
 endef
 
