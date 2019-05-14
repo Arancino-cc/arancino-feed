@@ -6,14 +6,14 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.3.3
-PKG_RELEASE:=1
+PKG_VERSION:=2.3.4
+PKG_RELEASE:=2
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=ssh://git@git.smartme.io:20022/consulting/sacertis/iotronic-lightning-rod.git
-PKG_HASH:=126da93e38fab065fe631dfdf0f58ebfd8fc4231
+PKG_HASH:=ebdb85a65cd14e0fc18e1ae5608532e5b6347868
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_HASH)
 
@@ -93,6 +93,11 @@ define Package/node-iotronic-lightning-rod/install
 	# configure monit
 	$(INSTALL_DIR) $(1)/etc/monit.d
 	$(CP) ./files/etc/monit.d/* $(1)/etc/monit.d
+
+	# configure pluginExec
+	$(LN) /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/pluginExec/create_plugin_env $(1)/usr/bin/create_plugin_env
+
+
 endef
 
 define Package/node-iotronic-lightning-rod/preinst

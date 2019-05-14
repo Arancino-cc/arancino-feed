@@ -9,27 +9,27 @@ start() {
 	echo 23 > /sys/class/gpio/export
 	echo out > /sys/class/gpio/gpio23/direction
 	echo 0 > /sys/class/gpio/gpio23/active_low
-	ln -s /sys/class/gpio/gpio23 /dev/relay1
+	ln -s /sys/class/gpio/gpio23/value /dev/relay1
         # Gpio for Relay2
         echo 24 > /sys/class/gpio/export
         echo out > /sys/class/gpio/gpio24/direction
         echo 0 > /sys/class/gpio/gpio24/active_low
-	ln -s /sys/class/gpio/gpio24 /dev/relay2	
+	ln -s /sys/class/gpio/gpio24/value /dev/relay2	
         # Gpio for Led Green
         echo 19 > /sys/class/gpio/export
         echo out > /sys/class/gpio/gpio19/direction
         echo 0 > /sys/class/gpio/gpio19/active_low
-        ln -s /sys/class/gpio/gpio19 /dev/green_led
+        ln -s /sys/class/gpio/gpio19/value /dev/green_led
         # Gpio for Led Red
         echo 16 > /sys/class/gpio/export
         echo out > /sys/class/gpio/gpio16/direction
         echo 0 > /sys/class/gpio/gpio16/active_low
-        ln -s /sys/class/gpio/gpio16 /dev/red_led
+        ln -s /sys/class/gpio/gpio16/value /dev/red_led
         # Gpio for Led Blue
         echo 21 > /sys/class/gpio/export
         echo out > /sys/class/gpio/gpio21/direction
         echo 0 > /sys/class/gpio/gpio21/active_low
-        ln -s /sys/class/gpio/gpio21 /dev/blue_led
+        ln -s /sys/class/gpio/gpio21/value /dev/blue_led
 }
 
 

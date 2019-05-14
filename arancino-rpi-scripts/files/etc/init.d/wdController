@@ -1,0 +1,33 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=99
+
+boot () {
+
+        logger -t DEBUG "wdController booting..."
+        start
+}
+
+
+start() {
+
+        logger -t DEBUG "wdController started!"
+        /usr/bin/wdController > /dev/null &
+
+}
+
+
+stop() {
+
+        pkill -9 -f /usr/bin/wdController
+        logger -t DEBUG "wdController stopped!"
+        echo "wdController stopped"
+        echo "Restoring procd:"
+        sleep 3
+        ubus call system watchdog '{"stop": false}'
+}
+
+restart() {
+	echo "restart not available"
+}

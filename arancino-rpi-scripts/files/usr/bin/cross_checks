@@ -1,0 +1,76 @@
+#!/bin/bash
+
+echo -e "#################################"
+echo -e "\n ST-SmartMe.IO cross-checks v1.3\n"
+echo -e "#################################\n\n\n"
+
+echo "##################"
+echo " PACKAGES STATUS"
+echo "##################"
+echo -e "\nComponents versions:"
+st_packages=$(opkg list_installed | grep shm)
+echo -e "- ST Packages:\n$st_packages"  
+echo -e "\n- Lightning-rod: \n"`opkg list_installed | grep lightning-rod`
+
+echo -e "\n"
+echo -e "Latest available versions:"
+echo -e `opkg list | grep node-iotronic-lightning-rod`
+av_st_packages=$(opkg list | grep shm-)
+echo -e "$av_st_packages"
+
+echo -e "\n"
+echo "####################"
+echo " RUNNING COMPONENTS"
+echo "####################"
+LR=$(pgrep -l -f lightning-rod)
+echo -e "- Lightning-rod:\n$LR"
+echo -e "\n- Node-RED:\n"`pgrep -l -f node-red`
+echo -e "\n- Gateway Server:\n"`pgrep -l -f shm_gateway_server`
+echo -e "\n- Connectivity Service:\n"`pgrep -l -f connectivityservice`
+canS=$(pgrep -l -f canstreamer)
+echo -e "\n- CanStreamer:\n$canS" 
+echo -e "\n- DataLogger:\n"`pgrep -l -f datalogger`
+echo -e "\n- Monit:\n"`pgrep -l -f monit`
+echo -e "\n"
+
+
+echo "###################"
+echo " FUNCTIONAL CHECKS "
+echo "###################"
+lr_output=`curl -s -H "Content-Type:application/json" -X GET http://localhost:8888/diagnostics | python3 -c "import sys, json; 
+res=json.load(sys.stdin);
+print('\n--> LR PID: '+str(res['lr_pid']));
+print('--> Internet connection: '+str(res['internet_connection']['status']));
+print('--> IoTronic connection: '+str(res['wamp_connection']['status']))
+print('--> DEBUG:\n'+str(res))
+"`
+echo "- Lightning-rod status: $lr_output" 
+echo -e "\n"
+
+#echo "- Gateway server: " `curl -s -H "Content-Type:application/json" -X GET http://192.168.1.126:5757/api/v0001/gateway/swagger.json | python3 -c "import sys, json; print("http://192.168.1.126:5757/api/v0001/gateway/swagger.json"); print(json.load(sys.stdin)['basePath'])"`
+echo -e "- Gateway server: HTTP response" `curl -IL http://localhost:5757/api/v0001/gateway/swagger.json -o /dev/null -w '%{http_code}\n' -s`
+
+echo -e "\n"
+
+#echo "- Connectivity Service: " 
+#echo `curl --verbose -d '{"timeout":"3000"}' -H "Content-Type:application/json" -X POST http://localhost:3000/wifi/keepalive`
+echo -e "- Connectivity Service: HTTP response" `curl -L -d '{"timeout":"3000"}' -H "Content-Type:application/json" -X POST http://localhost:3000/wifi/keepalive -o /dev/null -w '%{http_code}\n' -s`
+echo -e "\n"
+
+
+#Datalogger check
+#curl -s -H "Content-Type:text/html" -X GET http://localhost:5000/get_summary
+echo -e "- DataLogger service: HTTP response" `curl -s -H "Content-Type:text/html" -X GET http://localhost:5000/get_summary -o /dev/null -w '%{http_code}\n' -s`
+echo -e "\n"
+
+#echo -e "- DataLogger data:"
+#files=$(ls -l /data)
+#echo -e "--> check 1"
+#echo -e "\n$files"
+#sleep 2
+#echo -e "--> check 2"
+#files=$(ls -l /data)
+#echo -e "\n$files"
+#echo -e "\n"
+
+echo "TEST COMPLETED"
