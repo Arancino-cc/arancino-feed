@@ -17,7 +17,7 @@ PKG_HASH:=126da93e38fab065fe631dfdf0f58ebfd8fc4231
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_HASH)
 
-PKG_BUILD_DEPENDS:=node libc libpthread
+PKG_BUILD_DEPENDS:=node
 PKG_NODE_VERSION:=6.11.4
 PKG_USE_MIPS16:=0
 
@@ -29,7 +29,7 @@ define Package/node-iotronic-lightning-rod
   CATEGORY:=Languages
   TITLE:=Stack4Things Lightning-rod
   URL:=https://www.npmjs.org/package/iotronic-lightning-rod
-  DEPENDS:=+node +libfuse +libpthread +libc +gdb +node-lsof +patch
+  DEPENDS:=+node +libfuse +gdb +node-lsof +patch
 endef
 
 define Package/node-iotronic-lightning-rod/description
