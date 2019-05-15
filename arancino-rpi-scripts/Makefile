@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=39
+PKG_RELEASE:=40
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -70,6 +70,9 @@ define Package/arancino-rpi-scripts/install
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/hotplug.d/usb/21-ftdi-usb $(1)/etc/hotplug.d/usb
 	$(INSTALL_BIN) ./files/etc/hotplug.d/ntp/30-update-clock $(1)/etc/hotplug.d/ntp
+
+	# /etc/rsyslog
+	$(CP) ./files/etc/rsyslog/rsyslog.conf $(1)/etc/rsyslog
 	
 
 	$(CP) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
