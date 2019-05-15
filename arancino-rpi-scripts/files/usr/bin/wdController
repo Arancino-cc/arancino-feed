@@ -1,11 +1,11 @@
 #!/bin/ash
 
-# wdController v1.3
+# wdController v1.4
 
 ubus call system watchdog '{"magicclose": true}'
 ubus call system watchdog '{"stop": true}'
 
-while lsblk -d /dev/sda -f --output NAME,TYPE,STATE | grep disk > /dev/null; do
+while lsblk -f --output NAME,TYPE,STATE | grep disk > /dev/null; do
 
    # date 1>&2
    echo -n "X"
