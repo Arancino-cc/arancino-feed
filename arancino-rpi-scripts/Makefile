@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=40
+PKG_RELEASE:=41
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -72,7 +72,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/etc/hotplug.d/ntp/30-update-clock $(1)/etc/hotplug.d/ntp
 
 	# /etc/rsyslog
-	$(CP) ./files/etc/rsyslog/rsyslog.conf $(1)/etc/rsyslog
+	$(CP) ./files/etc/rsyslog/rsyslog.conf $(1)/etc/rsyslog.conf
 	
 
 	$(CP) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
