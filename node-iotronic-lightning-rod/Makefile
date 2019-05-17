@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.3.4
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
@@ -75,6 +75,8 @@ define Package/node-iotronic-lightning-rod/install
 
 	mkdir -p $(1)/usr/bin
 	$(LN) /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/configure_LR_arancino.sh $(1)/usr/bin/configure_LR_arancino
+	$(LN) /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/board_bkp_rest.sh $(1)/usr/bin/board_bkp_rest
+
 	# Not overwrite settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/settings.example.json $(1)/var/lib/iotronic/settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/modules/plugins-manager/plugins.example.json $(1)/var/lib/iotronic/plugins/plugins.json
