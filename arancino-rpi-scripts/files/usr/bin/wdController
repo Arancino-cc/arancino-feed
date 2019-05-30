@@ -1,17 +1,19 @@
 #!/bin/ash
 
-# wdController v1.5
+# wdController v1.6
 
 TEST=0
-CHECK="rw"
+CHECK1="rw"
+CHECK2="rw"
 
 ubus call system watchdog '{"magicclose": true}'
 ubus call system watchdog '{"stop": true}'
 
 
-while [ "$CHECK" != "ro" ] && [ $TEST = 0 ]; do
+while [ "$CHECK1" != "ro" ] && [ "$CHECK2" != "ro" ] && [ $TEST = 0 ]; do
 
-    CHECK=`cat /proc/mounts | grep /dev/sda1 | awk '{print substr($4,1,2)}'`
+    CHECK1=`cat /proc/mounts | grep /dev/sda1 | awk '{print substr($4,1,2)}'`
+    CHECK2=`cat /proc/mounts | grep /dev/sda3 | awk '{print substr($4,1,2)}'`
 
     lsblk -f --output NAME,TYPE,STATE | grep disk > /dev/null
     TEST=`echo $?`
