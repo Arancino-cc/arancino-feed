@@ -9,11 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-<<<<<<< Updated upstream
 PKG_RELEASE:=44
-=======
-PKG_RELEASE:=43
->>>>>>> Stashed changes
 
 include $(INCLUDE_DIR)/package.mk
 
