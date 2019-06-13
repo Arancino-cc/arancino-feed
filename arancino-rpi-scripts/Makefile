@@ -9,7 +9,11 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
+<<<<<<< Updated upstream
 PKG_RELEASE:=44
+=======
+PKG_RELEASE:=43
+>>>>>>> Stashed changes
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -81,12 +85,9 @@ then
 	# set the new default password
 	sed -i 's|^root::|root:\$$1\$$VmdTXWeP\$$c6u7hCp8MmragUglVncTI\/:|' $${IPKG_INSTROOT}/etc/shadow
 fi
-if [ -e $${IPKG_INSTROOT}/boot/config.txt ]
-then
-    # enable spi and configure can interface
-	echo dtoverlay=spi0-cs,cs0_pin=7 >> $${IPKG_INSTROOT}/boot/config.txt
-	echo dtoverlay=scs-max3107-spi0 >> $${IPKG_INSTROOT}/boot/config.txt
-fi 
+
+if ! grep -q scs-max3107-spi0 $${IPKG_INSTROOT}/boot/config.txt; then echo "dtoverlay=spi0-cs,cs0_pin=7" >> $${IPKG_INSTROOT}/boot/config.txt; echo "dtoverlay=scs-max3107-spi0" >> $${IPKG_INSTROOT}/boot/config.txt; fi
+if ! grep -q shm-gpio-keys $${IPKG_INSTROOT}/boot/config.txt; then echo "dtoverlay=shm-gpio-keys" >> $${IPKG_INSTROOT}/boot/config.txt; fi
 
 #mkdir -p $${IPKG_INSTROOT}/etc/crontabs
 #if ! grep -q hwclock $${IPKG_INSTROOT}/etc/crontabs/root; then echo $$'\n'"* */1 * * * hwclock -w" >>$${IPKG_INSTROOT}/etc/crontabs/root; fi
