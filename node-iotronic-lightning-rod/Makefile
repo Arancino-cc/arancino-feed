@@ -6,14 +6,14 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.3.4
-PKG_RELEASE:=2
+PKG_VERSION:=2.3.6
+PKG_RELEASE:=1
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=ssh://git@git.smartme.io:20022/consulting/sacertis/iotronic-lightning-rod.git
-PKG_HASH:=ebdb85a65cd14e0fc18e1ae5608532e5b6347868
+PKG_HASH:=ed2b103f0eb445e6f2acc0df4873d16d3c50608a
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_HASH)
 
@@ -75,6 +75,8 @@ define Package/node-iotronic-lightning-rod/install
 
 	mkdir -p $(1)/usr/bin
 	$(LN) /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/configure_LR_arancino.sh $(1)/usr/bin/configure_LR_arancino
+	$(LN) /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/board_bkp_rest.sh $(1)/usr/bin/board_bkp_rest
+
 	# Not overwrite settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/settings.example.json $(1)/var/lib/iotronic/settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/modules/plugins-manager/plugins.example.json $(1)/var/lib/iotronic/plugins/plugins.json
