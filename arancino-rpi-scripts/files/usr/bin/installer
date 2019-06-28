@@ -14,20 +14,197 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-#!/bin/sh
+#
+# Authors: Domenico La Fauci, Carmelo Romeo
+# Emails: mimmo@smartme.io, carmelo@smartme.io
+# Date : 18-06-2019
+#
 
 # has_sd=`mount | grep ^/dev/sda | grep 'on /overlay'`
 
+
+# CARMELO START
+# Global variables
+# --------------------------
+part1_size=2 #dimension of the sda1
+part2_size=2 #dimension of the sda2
+
+fs_type="f2fs" #f2fs, ext4
+flag_preserve_data=true
+# --------------------------
+
+# Syncing the extroot filesystem into /rom
+rsync_on_rom(){
+
+	echo "Syncing the extroot filesystem into /rom"
+	
+	mount -o remount,rw /dev/root
+	opkg update
+	opkg install rsync
+	rsync --checksum --recursive --one-file-system --links --perms -v --delete-delay --exclude=/data --include "/mnt" / /rom
+
+	sed -i '/#startoverlayconfig/,/#endovlerlayconfig/d' /rom/etc/config/fstab
+}
+
+
+# Create partitions after cleaning the old ones
+create_partitions(){
+
+	if [ ! $flag_preserve_data ]; then
+		echo "Deleting old partitions (including /data) and creating new ones"
+
+		dd if=/dev/zero of=/dev/sda bs=512 count=1
+		fdisk /dev/sda <<EOF
+n
+
+
+
++${part1_size}G
+n
+
+
+
++${part2_size}G
+n
+
+
+
+
+p
+w
+EOF
+	else
+		echo "Deleting old partitions (except /data) and erasing sda1 and sda2"
+		umount /dev/sda2
+		fdisk /dev/sda <<EOF
+d
+1
+d
+2
+n
+
+
+
++${part1_size}G
+n
+
+
+
+
+p
+w
+EOF
+	fi
+
+
+	if [ "$fs_type" == "f2fs" ]; then
+		mkfs.f2fs -l /sda1_partition /dev/sda1
+		mkfs.f2fs -l /rw_partition /dev/sda2
+		if [ ! $flag_preserve_data ]; then
+			mkfs.f2fs -l /data /dev/sda3
+		fi
+	elif [ "$fs_type" == "ext4" ]; then
+		mkfs.ext4 -F /dev/sda1
+		mkfs.ext4 -F /dev/sda2
+		if [ ! $flag_preserve_data ]; then
+			mkfs.ext4 -F /dev/sda3
+		fi
+	fi
+}
+
+
+# Update fstab with the new partitions and mount them
+update_fstab_and_mount(){
+
+	echo "Updating fstab and mounting new partitions"
+
+	cp /etc/config/fstab /etc/config/fstab_pre_readonly
+	block detect > /etc/config/fstab
+	sed -i "s/\toption\ttarget\t'\/mnt\/sda1'/\toption\tdevice\t'\/dev\/sda1'\n\toption\ttarget\t'\/sda1_partition'/g" /etc/config/fstab
+	sed -i "s/\toption\ttarget\t'\/mnt\/sda2'/\toption\tdevice\t'\/dev\/sda2'\n\toption\ttarget\t'\/rw_partition'/g" /etc/config/fstab
+	sed -i "s/\toption\ttarget\t'\/mnt\/sda3'/\toption\tdevice\t'\/dev\/sda3'\n\toption\ttarget\t'\/data'/g" /etc/config/fstab
+
+	for i in $(seq 1 3)
+	do
+		sda_line=$(grep -n "/dev/sda$i" /etc/config/fstab | cut -d: -f 1)
+		#echo $sda_line
+		line=$(($sda_line+3))
+		#echo $line
+		sed -i "${line}s/\toption\tenabled\t'0'/\toption\tenabled\t'1'/" /etc/config/fstab
+	done
+	cat /etc/config/fstab
+	sleep 5
+	block mount
+}
+
+
+# Move all the required folders into the SSD partition and create link to them
+create_and_link_folders(){
+	
+	echo "Creating and linking required folders"
+
+	# ------------------IOTRONIC-------------------------
+	# Check if the folder exists
+	if [ ! -d /rw_partition/iotronic ]; then
+		mkdir /rw_partition/iotronic
+	fi
+
+	# Check if the folders are already linked
+	cd /var/lib/iotronic/
+	for folder in drivers patches plugins
+	do
+		if [[ -L "$folder" && -d "$folder" ]]; then
+			echo "/var/lib/iotronic/$folder is already a symlink to a directory"
+		else
+			mv /var/lib/iotronic/$folder /rw_partition/iotronic/
+			ln -s /rw_partition/iotronic/$folder /var/lib/iotronic/$folder
+		fi
+	done
+	# ----------------------------------------------------
+
+
+	# --------------------LOGS----------------------------
+	# Check if the folder exists                                                                    
+	if [ ! -d /rw_partition/log ]; then                                            
+
+		mv /var/log /rw_partition/
+		ln -s /rw_partition/log /var/
+	else
+		folder=/var/log
+		if [[ -L "$folder" && -d "$folder" ]]; then
+			echo "$folder is already a symlink to a directory"
+		fi
+	fi
+	# ----------------------------------------------------
+}
+
+
+# Turn into read-only fs
+turn_into_ro(){
+
+	echo "Turning the fs into read-only"
+
+	if grep -q "/bin/mount -o remount,ro /" /etc/init.d/boot; then
+		echo "Remount already set"
+	else
+		sed -i "s/\t#mkdir -p \/var\/run/\t\/bin\/mount -o remount,ro \/\n\t#mkdir -p \/var\/run/g" /etc/init.d/boot
+	fi
+	#rpi-ro
+}
+# CARMELO STOP
+
+
+
 disclaimer () {
 
-echo ""
+	echo ""
 
-echo -e "DISCLAIMER :\n"
+	echo -e "DISCLAIMER :\n"
 
-echo -e "This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details."
+	echo -e "This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details."
 
 }
 
@@ -178,7 +355,7 @@ formatssd () {
         echo "Formatting partition 02..."
         echo ""
 
-	mkfs.f2fs -l driveSSD-02 /dev/sda2
+		mkfs.f2fs -l driveSSD-02 /dev/sda2
 
         sleep 10
 
@@ -607,15 +784,16 @@ then
 	while [ "$done" != "true" ]
 	do
 
-	  welcome
+	  	welcome
 
-      echo "Arancino installation menu"
-      echo ""
-	  echo "1. Initialize SSD and Configure Extroot"
-	  echo "2. Uninstall Extroot"
-	  echo "3. Update ReadOnly SDCard"
-      echo "4. Exit and reboot"
-      echo "0. Exit"
+			echo "Arancino installation menu"
+			echo ""
+			echo "1. Initialize SSD and Configure Extroot"
+			echo "2. Uninstall Extroot"
+			echo "3. Update ReadOnly SDCard"
+			echo "4. Finalize SDCard ReadOnly configuration"
+			echo "5. Exit and reboot"
+			echo "0. Exit"
 
 
       echo " "
@@ -710,7 +888,7 @@ then
 				#----------------- Choice-3---------------------
 				# Update ReadOnly SDCard
 				3)
-				if ! `grep -qs '/dev/sda1 /' /proc/mounts`
+				if `grep -qs '/dev/sda1 /' /proc/mounts`
 				then
 
 					echo ""
@@ -719,7 +897,22 @@ then
 
 					sleep 2
 
-					echo "NEED TO BE IMPLEMENTED"
+					# CARMELO START
+					rsync_on_rom
+
+					echo ""
+					echo "Your system will be rebooted in 10 seconds !"
+					echo ""
+
+					countdown "00:00:10"
+
+					echo ""
+					echo "Rebooting..."
+					echo ""
+
+					reboot && exit
+					# CARMELO STOP
+
 					echo ""
 					echo "Update complete !"
 					echo ""
@@ -728,16 +921,46 @@ then
 				else
 
 					echo ""
-					echo "Extroot need to be installed."
+					echo "SSD not installed and configured."
 					echo ""
 
 				fi
 
 				;;
-
-				#------------------Choice-4----------------------
-				# System reboot
+				# CARMELO START
+				#----------------- Choice-4---------------------
+				# Finalize SD ReadOnly configuration
 				4)
+				echo ""
+				echo "Updating files and folders..."
+				echo ""
+				create_partitions
+				update_fstab_and_mount
+				create_and_link_folders
+				turn_into_ro
+
+				echo ""
+				echo "Starting from the next reboot your system will be started in read-only!"
+				echo ""
+
+				echo ""
+				echo "Your system will be rebooted in 10 seconds !"
+				echo ""
+
+				countdown "00:00:10"
+
+				echo ""
+				echo "Rebooting..."
+				echo ""
+
+				reboot && exit
+				;;
+
+				# CARMELO STOP
+
+				#------------------Choice-5----------------------
+				# System reboot
+				5)
 
 				echo ""
 				echo "Your system will be rebooted in 10 seconds !"
