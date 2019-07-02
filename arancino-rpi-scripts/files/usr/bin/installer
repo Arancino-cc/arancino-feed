@@ -17,13 +17,11 @@
 #
 # Authors: Domenico La Fauci, Carmelo Romeo
 # Emails: mimmo@smartme.io, carmelo@smartme.io
-# Date : 18-06-2019
+# Date : 02-07-2019
 #
 
 # has_sd=`mount | grep ^/dev/sda | grep 'on /overlay'`
 
-
-# CARMELO START
 # Global variables
 # --------------------------
 part1_size=2 #dimension of the sda1
@@ -162,6 +160,19 @@ create_and_link_folders(){
 	done
 	# ----------------------------------------------------
 
+        # --------------------MONIT---------------------------
+        # Check if the folder exists
+        if [ ! -d /rw_partition/monit ]; then
+
+                mv /var/tmp/monit /rw_partition/
+                ln -s /rw_partition/monit /var/tmp/monit
+        else
+                folder=/var/tmp/monit
+                if [[ -L "$folder" && -d "$folder" ]]; then
+                        echo "$folder is already a symlink to a directory"
+                fi
+        fi
+        # ----------------------------------------------------
 
 	# --------------------LOGS----------------------------
 	# Check if the folder exists                                                                    
@@ -191,7 +202,7 @@ turn_into_ro(){
 	fi
 	#rpi-ro
 }
-# CARMELO STOP
+
 
 
 
@@ -355,7 +366,7 @@ formatssd () {
         echo "Formatting partition 02..."
         echo ""
 
-		mkfs.f2fs -l driveSSD-02 /dev/sda2
+	mkfs.f2fs -l driveSSD-02 /dev/sda2
 
         sleep 10
 
@@ -897,7 +908,6 @@ then
 
 					sleep 2
 
-					# CARMELO START
 					rsync_on_rom
 
 					echo ""
@@ -911,7 +921,6 @@ then
 					echo ""
 
 					reboot && exit
-					# CARMELO STOP
 
 					echo ""
 					echo "Update complete !"
@@ -927,7 +936,6 @@ then
 				fi
 
 				;;
-				# CARMELO START
 				#----------------- Choice-4---------------------
 				# Finalize SD ReadOnly configuration
 				4)
@@ -955,8 +963,6 @@ then
 
 				reboot && exit
 				;;
-
-				# CARMELO STOP
 
 				#------------------Choice-5----------------------
 				# System reboot
