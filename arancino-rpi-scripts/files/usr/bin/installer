@@ -17,7 +17,7 @@
 #
 # Authors: Domenico La Fauci, Carmelo Romeo
 # Emails: mimmo@smartme.io, carmelo@smartme.io
-# Date : 02-07-2019
+# Date : 04-07-2019
 #
 
 # has_sd=`mount | grep ^/dev/sda | grep 'on /overlay'`
@@ -155,31 +155,25 @@ create_and_link_folders(){
 			echo "/var/lib/iotronic/$folder is already a symlink to a directory"
 		else
 			mv /var/lib/iotronic/$folder /rw_partition/iotronic/
-			ln -s /rw_partition/iotronic/$folder /var/lib/iotronic/$folder
+			ln -sf /rw_partition/iotronic/$folder /var/lib/iotronic/$folder
 		fi
 	done
 	# ----------------------------------------------------
 
-        # --------------------MONIT---------------------------
-        # Check if the folder exists
-        if [ ! -d /rw_partition/monit ]; then
-
-                mv /var/tmp/monit /rw_partition/
-                ln -s /rw_partition/monit /var/tmp/monit
-        else
-                folder=/var/tmp/monit
-                if [[ -L "$folder" && -d "$folder" ]]; then
-                        echo "$folder is already a symlink to a directory"
-                fi
-        fi
-        # ----------------------------------------------------
+	# --------------------MONIT---------------------------
+	# Check if the file exists
+	if [ ! -f /tmp/.monit.id ]; then
+		ln -sf /tmp/.monit.id /root/.monit.id
+		ln -sf /tmp/.monit.state /root/.monit.state
+	fi
+	# ----------------------------------------------------
 
 	# --------------------LOGS----------------------------
 	# Check if the folder exists                                                                    
 	if [ ! -d /rw_partition/log ]; then                                            
 
 		mv /var/log /rw_partition/
-		ln -s /rw_partition/log /var/
+		ln -sf /rw_partition/log /var/
 	else
 		folder=/var/log
 		if [[ -L "$folder" && -d "$folder" ]]; then
