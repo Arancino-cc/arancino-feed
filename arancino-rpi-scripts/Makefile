@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=46
+PKG_RELEASE:=47
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -67,7 +67,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/ttyMAX $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/gpio_conf $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/etc/init.d/wdController $(1)/etc/init.d
+	#$(INSTALL_BIN) ./files/etc/init.d/wdController $(1)/etc/init.d
 
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/hotplug.d/usb/21-ftdi-usb $(1)/etc/hotplug.d/usb
@@ -95,7 +95,7 @@ if ! grep -q procps-ng-top $${IPKG_INSTROOT}/etc/profile; then echo "alias top='
 
 $${IPKG_INSTROOT}/etc/init.d/gpio_conf enable
 
-$${IPKG_INSTROOT}/etc/init.d/wdController enable
+#$${IPKG_INSTROOT}/etc/init.d/wdController enable
 
 exit 0
 endef
