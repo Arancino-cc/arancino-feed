@@ -17,7 +17,7 @@
 #
 # Authors: Domenico La Fauci, Carmelo Romeo
 # Emails: mimmo@smartme.io, carmelo@smartme.io
-# Date : 04-07-2019
+# Date : 09-07-2019
 #
 
 # has_sd=`mount | grep ^/dev/sda | grep 'on /overlay'`
@@ -29,6 +29,7 @@ part2_size=2 #dimension of the sda2
 
 fs_type="f2fs" #f2fs, ext4
 flag_preserve_data=true
+nodered_dir=/opt/shm-gateway/node-red
 # --------------------------
 
 # Syncing the extroot filesystem into /rom
@@ -160,13 +161,6 @@ create_and_link_folders(){
 	done
 	# ----------------------------------------------------
 
-	# --------------------MONIT---------------------------
-	# Check if the file exists
-	if [ ! -f /tmp/.monit.id ]; then
-		ln -sf /tmp/.monit.id /root/.monit.id
-		ln -sf /tmp/.monit.state /root/.monit.state
-	fi
-	# ----------------------------------------------------
 
 	# --------------------LOGS----------------------------
 	# Check if the folder exists                                                                    
@@ -216,9 +210,13 @@ disclaimer () {
 returngigs () {
 
 	size=`fdisk -l | grep "Disk /dev/sda" | awk {'print $5'}`
+	size1=$((size/1000000000))
+	echo "Hard disk size is: $size1 GB"
 
+	size=$((size/1000))
 	#echo "Size detected: $size"
-	if [ $size -gt 63000000000 ]
+	#if [ $size -gt 63000000000 ]
+	if [ $size -gt 63000000 ]
 
 	  then
 
@@ -226,7 +224,8 @@ returngigs () {
 	    #echo "Size partition: $sizetoformat"
 	    return 0
 
-	elif [ $size -lt 32500000000 -a $size -gt 31000000000 ]
+	#elif [ $size -lt 32500000000 -a $size -gt 31000000000 ]
+	elif [ $size -lt 32500000 -a $size -gt 31000000 ]
 
 	  then
 
@@ -234,35 +233,40 @@ returngigs () {
 	    return 0
 
 
-	elif [ $size -lt 16500000000 -a $size -gt 15000000000 ]
+	#elif [ $size -lt 16500000000 -a $size -gt 15000000000 ]
+	elif [ $size -lt 16500000 -a $size -gt 15000000 ]
 
 	  then
 
 	    sizetoformat=+'14500MB'
 	    return 0
 
-	elif [ $size -lt 8500000000 -a $size -gt 7000000000 ]
+	#elif [ $size -lt 8500000000 -a $size -gt 7000000000 ]
+	elif [ $size -lt 8500000 -a $size -gt 7000000 ]
 
 	  then
 
 	    sizetoformat=+'7000MB'
 	    return 0
 
-	elif [ $size -lt 4500000000 -a $size -gt 3000000000 ]
+	#elif [ $size -lt 4500000000 -a $size -gt 3000000000 ]
+	elif [ $size -lt 4500000 -a $size -gt 3000000 ]
 
 	  then
 
 	    sizetoformat=+'3000MB'
 	    return 0
 
-	elif [ $size -lt 2500000000 -a $size -gt 1000000000 ]
+	#elif [ $size -lt 2500000000 -a $size -gt 1000000000 ]
+	elif [ $size -lt 2500000 -a $size -gt 1000000 ]
 
 	  then
 
 	    sizetoformat=+'1000MB'
 	    return 0
 
-	elif [ $size -lt 1500000000 -a $size -gt 900000000 ]
+	#elif [ $size -lt 1500000000 -a $size -gt 900000000 ]
+	elif [ $size -lt 1500000 -a $size -gt 900000 ]
 
 	  then
 
@@ -360,7 +364,7 @@ formatssd () {
         echo "Formatting partition 02..."
         echo ""
 
-	mkfs.f2fs -l driveSSD-02 /dev/sda2
+		mkfs.f2fs -l driveSSD-02 /dev/sda2
 
         sleep 10
 
