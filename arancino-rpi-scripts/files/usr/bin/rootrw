@@ -2,4 +2,4 @@
 
 mount -o remount,rw /dev/mmcblk0p2  /
 echo "Filesystem is unlocked - Write access"
-echo "type ' rpi-ro ' to lock"
+echo "type ' rootro ' to lock"

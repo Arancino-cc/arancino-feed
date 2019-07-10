@@ -17,7 +17,7 @@
 #
 # Authors: Domenico La Fauci, Carmelo Romeo
 # Emails: mimmo@smartme.io, carmelo@smartme.io
-# Date : 09-07-2019
+# Date : 10-07-2019
 #
 
 # has_sd=`mount | grep ^/dev/sda | grep 'on /overlay'`
@@ -161,6 +161,12 @@ create_and_link_folders(){
 	done
 	# ----------------------------------------------------
 
+	# ----------------------OPKG--------------------------
+	# Necessary to make cross_check to list the installed packages
+	if [ ! -f /var/run/opkg.lock ]; then
+		ln -sf /var/run/opkg.lock /var/lock/opkg.lock
+	fi
+	# ----------------------------------------------------
 
 	# --------------------LOGS----------------------------
 	# Check if the folder exists                                                                    
