@@ -1,5 +1,8 @@
 #!/bin/sh
 
+set -e
+
 mount -o remount,rw /dev/mmcblk0p2  /
+
 echo "Filesystem is unlocked - Write access"
-echo "type ' rootro ' to lock"
+#echo "type ' rootro ' to lock"

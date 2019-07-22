@@ -59,7 +59,7 @@ define Package/arancino-rpi-scripts/install
 	$(INSTALL_BIN) ./files/usr/bin/wifi-reset-and-reboot $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/installer $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/cross_checks $(1)/usr/bin
-	$(INSTALL_BIN) ./files/usr/bin/wdController $(1)/usr/bin
+	#$(INSTALL_BIN) ./files/usr/bin/wdController $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/rootro $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/rootrw $(1)/usr/bin
 
