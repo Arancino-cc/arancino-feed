@@ -15,9 +15,9 @@
 #
 
 #
-# Authors: Domenico La Fauci, Carmelo Romeo
-# Emails: mimmo@smartme.io, carmelo@smartme.io
-# Date : 10-07-2019
+# Authors: Domenico La Fauci, Carmelo Romeo, Arturo Rinaldi
+# Emails: mimmo@smartme.io, carmelo@smartme.io, arturo@smartme.io
+# Date : 25-07-2019
 #
 
 # has_sd=`mount | grep ^/dev/sda | grep 'on /overlay'`
@@ -36,7 +36,7 @@ nodered_dir=/opt/shm-gateway/node-red
 rsync_on_rom(){
 
 	echo "Syncing the extroot filesystem into /rom"
-	
+
 	mount -o remount,rw /dev/root
 	opkg update
 	opkg install rsync
@@ -49,7 +49,7 @@ rsync_on_rom(){
 # Create partitions after cleaning the old ones
 create_partitions(){
 
-	if [ ! $flag_preserve_data ]; then
+	if [ $flag_preserve_data == false ]; then
 		echo "Deleting old partitions (including /data) and creating new ones"
 
 		dd if=/dev/zero of=/dev/sda bs=512 count=1
@@ -99,18 +99,41 @@ EOF
 	if [ "$fs_type" == "f2fs" ]; then
 		mkfs.f2fs -l /sda1_partition /dev/sda1
 		mkfs.f2fs -l /rw_partition /dev/sda2
-		if [ ! $flag_preserve_data ]; then
+		if [ $flag_preserve_data == false ]; then
 			mkfs.f2fs -l /data /dev/sda3
 		fi
 	elif [ "$fs_type" == "ext4" ]; then
 		mkfs.ext4 -F /dev/sda1
 		mkfs.ext4 -F /dev/sda2
-		if [ ! $flag_preserve_data ]; then
+		if [ $flag_preserve_data == false ]; then
 			mkfs.ext4 -F /dev/sda3
 		fi
 	fi
 }
 
+
+# Update fstab with the new partitions and mount them
+update_fstab_and_mount(){
+
+	echo "Updating fstab and mounting new partitions"
+	cp /etc/config/fstab /etc/config/fstab_pre_readonly
+	block detect > /etc/config/fstab
+	sed -i "s/\toption\ttarget\t'\/mnt\/sda1'/\toption\tdevice\t'\/dev\/sda1'\n\toption\ttarget\t'\/sda1_partition'/g" /etc/config/fstab
+	sed -i "s/\toption\ttarget\t'\/mnt\/sda2'/\toption\tdevice\t'\/dev\/sda2'\n\toption\ttarget\t'\/rw_partition'/g" /etc/config/fstab
+	sed -i "s/\toption\ttarget\t'\/mnt\/sda3'/\toption\tdevice\t'\/dev\/sda3'\n\toption\ttarget\t'\/data'/g" /etc/config/fstab
+
+	for i in $(seq 1 3)
+	do
+		sda_line=$(grep -n "/dev/sda$i" /etc/config/fstab | cut -d: -f 1)
+		#echo $sda_line
+		line=$(($sda_line+3))
+		#echo $line
+		sed -i "${line}s/\toption\tenabled\t'0'/\toption\tenabled\t'1'/" /etc/config/fstab
+	done
+	cat /etc/config/fstab
+	sleep 5
+	block mount
+}
 
 # Update fstab with the new partitions and mount them
 update_fstab_and_mount(){
@@ -139,7 +162,7 @@ update_fstab_and_mount(){
 
 # Move all the required folders into the SSD partition and create link to them
 create_and_link_folders(){
-	
+
 	echo "Creating and linking required folders"
 
 	# ------------------IOTRONIC-------------------------
@@ -169,8 +192,8 @@ create_and_link_folders(){
 	# ----------------------------------------------------
 
 	# --------------------LOGS----------------------------
-	# Check if the folder exists                                                                    
-	if [ ! -d /rw_partition/log ]; then                                            
+	# Check if the folder exists
+	if [ ! -d /rw_partition/log ]; then
 
 		mv /var/log /rw_partition/
 		ln -sf /rw_partition/log /var/
@@ -357,7 +380,7 @@ formatssd () {
         umountallsda
 
         sleep 10
-	
+
         echo ""
         echo "Formatting partition 01..."
         echo ""
@@ -511,18 +534,18 @@ formatvfatoverlay () {
 
 logo () {
 cat <<"EOT"
-    _                         _             
-   / \   _ __ __ _ _ __   ___(_)_ __   ___  
-  / _ \ | '__/ _` | '_ \ / __| | '_ \ / _ \ 
+    _                         _
+   / \   _ __ __ _ _ __   ___(_)_ __   ___
+  / _ \ | '__/ _` | '_ \ / __| | '_ \ / _ \
  / ___ \| | | (_| | | | | (__| | | | | (_) |
-/_/   \_\_|  \__,_|_| |_|\___|_|_| |_|\___/ 
-                                            
- ___           _        _ _           
-|_ _|_ __  ___| |_ __ _| | | ___ _ __ 
+/_/   \_\_|  \__,_|_| |_|\___|_|_| |_|\___/
+
+ ___           _        _ _
+|_ _|_ __  ___| |_ __ _| | | ___ _ __
  | || '_ \/ __| __/ _` | | |/ _ \ '__|
- | || | | \__ \ || (_| | | |  __/ |   
-|___|_| |_|___/\__\__,_|_|_|\___|_|   
-                                      
+ | || | | \__ \ || (_| | | |  __/ |
+|___|_| |_|___/\__\__,_|_|_|\___|_|
+
 EOT
 }
 
@@ -630,7 +653,7 @@ systemoverlay () {
 	#Mounts the newly created partitions
 	mkdir -p /tmp/introot
 	mkdir -p /tmp/extroot
-	
+
 	mount --bind / /tmp/introot
 	mount /dev/sda1 /tmp/extroot
 
@@ -665,7 +688,7 @@ alignSDCard () {
 
 	#Mounts the newly created partitions
 	mkdir -p /tmp/extroot
-	
+
 	mount --bind / /tmp/extroot
 	mount -o remount,rw /dev/root
 
@@ -690,7 +713,7 @@ alignSDCard () {
 initialize_configure () {
 	#echo ""
 	#prereqs
-	
+
 	#sleep 2
 
 	echo ""
@@ -704,7 +727,7 @@ initialize_configure () {
 	formatssd $sizetoformat
 
 	sleep 5
-	
+
 	#Kill process that write on the disk
 	killprocesses
 
@@ -763,9 +786,9 @@ revert () {
 }
 
 killprocesses () {
-	echo ""                                                                                            
-        echo "Killing process before start..."                                                              
-        echo ""    
+	echo ""
+        echo "Killing process before start..."
+        echo ""
 	pkill monit
 	pkill influxd
 	pkill mosquitto
@@ -774,27 +797,117 @@ killprocesses () {
 
 removePrevMount () {
 	if (`grep -qs 'startoverlayconfig' /etc/config/fstab`)
-        then  	
+        then
 		sed '/#startoverlayconfig/,/#endoverlayconfig/d' /etc/config/fstab > /etc/config/fstab.new
 		mv /etc/config/fstab.new /etc/config/fstab
 	fi
 }
 
+set_check_overlay () {
+
+	if `grep -qs '/dev/sda1 /' /proc/mounts`
+	then
+		echo ""
+		echo "Overlay already up and running ! Aborting..."
+		echo "Overlay already up and running ! Aborting..." > /dev/kmsg
+		echo ""
+
+		exit 0
+	fi
+
+	initialize_configure
+
+}
+
+#-------------------PARSING OPTIONS-----------------
+
+# initialize defaults
+export INTERACTIVE=0
+export RESTORE=0
+export NEW_MODE=0
+export SET_CHECK_OVERLAY=0
+export HELP=0
+
+# parse options
+case "$1" in
+	-i) export INTERACTIVE=1;;
+	-r) export REVERT=1;;
+	-o) export SET_CHECK_OVERLAY=1;;
+	-p) export NEW_MODE=1;;
+	-h|--help|"") export HELP=1; break;;
+	-*|*)
+		echo "Invalid option: $1"
+		exit 1
+	;;
+esac
+shift;
+
+[ $HELP -gt 0 ] && {
+	cat <<EOF
+Usage: $0 [<script-option>...]
+
+script-option:
+	-i           interactive mode
+	-r           revert extroot configuration to sdcard
+	-o					 initizializing overlay on filesystem
+	-p           new unattended setup
+	-h | --help  display this help
+
+EOF
+	exit 1
+}
+
+#---------------------PRELIMINARY-CHECK--------------
+
+if ! `block info | grep -qs '/dev/sda'`
+then
+
+	echo ""
+	echo "Can't mount SSD drive, check your system configuration !"
+	echo "Can't mount SSD drive, check your system configuration !" > /dev/kmsg
+	echo ""
+
+	exit 1
+fi
+
 #--------------------------------MENU-START----------------------------------------
 
 size=`fdisk -l | grep "Disk /dev/sda" | awk {'print $5'}`
-if ([ "$1" == "-i" ])
+if ([ "$REVERT" == "1" ])
 then
 
-      clear
+		revert
 
-      disclaimer
+elif ([ "$NEW_MODE" == "1" ])
+then
 
-      echo ""
-      read -p "Press [Enter] key to continue..."
-      echo ""
+		echo "Starting unattended setup....."
+		flag_preserve_data=false
+		create_partitions
+		update_fstab_and_mount
+		create_and_link_folders
+		turn_into_ro
+		echo "Rebooting....."
+		countdown "00:00:05"
+		reboot
 
-      clear
+elif [ "$SET_CHECK_OVERLAY" == "1" ]
+then
+
+		set_check_overlay
+
+elif ([ "$INTERACTIVE" == "1" ])
+then
+
+    clear
+
+    disclaimer
+
+    echo ""
+    read -p "Press [Enter] key to continue..."
+    echo ""
+
+    clear
 
 	while [ "$done" != "true" ]
 	do
@@ -837,8 +950,8 @@ then
 					then
 						echo ""
 						echo "Drive discovered..,."
-						
-						if ! `grep -qs '/dev/sda1 /' /proc/mounts` 
+
+						if ! `grep -qs '/dev/sda1 /' /proc/mounts`
 						then
 							echo ""
 							echo "WARNING : All data on your SSD Would will be erased, are you sure ? (y/n)"
@@ -1006,40 +1119,4 @@ then
 			esac
 
 	done
-
-elif [ $size -gt 100000000 ] || (( `block info | grep -qs '/dev/sda'` && returngigs ) && [ -z $1 ] )
-then
-
-	welcome
-
-	if `grep -qs '/dev/sda1 /' /proc/mounts`
-	then
-		echo ""
-		echo "Overlay already up and running ! Aborting..."
-		echo "Overlay already up and running ! Aborting..." > /dev/kmsg
-		echo ""
-
-		exit 0
-	fi
-	
-	initialize_configure
-	
-elif ([ "$1" == "-h" ])
-then
-	echo ""
-	echo "Usage:"
-	echo " installer 		inizialize ssd and install extroot"
-	echo " installer -i 		interactive menu"
-	echo " installer -r 		revert extroot configuration to sdcard"
-elif ([ "$1" == "-r" ])
-then
-	revert
-
-elif ! `block info | grep -qs '/dev/sda'`
-then
-
-	echo ""
-	echo "Can't mount SSD drive, check your system configuration !"
-	echo "Can't mount SSD drive, check your system configuration !" > /dev/kmsg
-	echo ""
 fi
