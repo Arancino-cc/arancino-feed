@@ -7,17 +7,17 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
 #
 # Authors: Domenico La Fauci, Carmelo Romeo, Arturo Rinaldi
 # Emails: mimmo@smartme.io, carmelo@smartme.io, arturo@smartme.io
-# Date : 25-07-2019
+# Date : 09-09-2019
 #
 
 # has_sd=`mount | grep ^/dev/sda | grep 'on /overlay'`
@@ -48,6 +48,28 @@ rsync_on_rom(){
 
 # Create partitions after cleaning the old ones
 create_partitions(){
+
+	echo "Unmounting the partitions and killing blocking processes"
+
+	for i in 1 2 3
+	do
+		if grep -q "/dev/sda$i" /proc/mounts; then
+
+			partition=`cat /proc/mounts | grep "/dev/sda$i" | awk '{print $2}'`
+			echo -e "\nPartition: $partition"
+			p_to_kill=`lsof | grep "$partition" | awk '{print $2}' | sort -n | uniq`
+			echo "Processes to kill: $p_to_kill"
+
+			for p in $p_to_kill
+			do
+				echo "Killing process: $p"
+				kill -9 $p
+			done
+
+			echo -e "Umounting /dev/sda$i\n"
+			umount -l /dev/sda$i
+		fi
+	done
 
 	if [ $flag_preserve_data == false ]; then
 		echo "Deleting old partitions (including /data) and creating new ones"
@@ -115,7 +137,16 @@ EOF
 # Update fstab with the new partitions and mount them
 update_fstab_and_mount(){
 
-	echo "Updating fstab and mounting new partitions"
+	flag_rw=false
+	if grep -q "/bin/mount -o remount,ro /" /etc/init.d/boot &&
+	   grep -q "/dev/root / ext4 ro" /proc/mounts; then
+
+		# It is necessary to remove the read-only to apply changes to fstab
+		flag_rw=true
+		rootrw
+	fi
+
+	echo -e "\n\nUpdating fstab and mounting new partitions"
 	cp /etc/config/fstab /etc/config/fstab_pre_readonly
 	block detect > /etc/config/fstab
 	sed -i "s/\toption\ttarget\t'\/mnt\/sda1'/\toption\tdevice\t'\/dev\/sda1'\n\toption\ttarget\t'\/sda1_partition'/g" /etc/config/fstab
@@ -132,85 +163,121 @@ update_fstab_and_mount(){
 	done
 	cat /etc/config/fstab
 	sleep 5
-	block mount
-}
+	#block mount
 
-# Update fstab with the new partitions and mount them
-update_fstab_and_mount(){
-
-	echo "Updating fstab and mounting new partitions"
-
-	cp /etc/config/fstab /etc/config/fstab_pre_readonly
-	block detect > /etc/config/fstab
-	sed -i "s/\toption\ttarget\t'\/mnt\/sda1'/\toption\tdevice\t'\/dev\/sda1'\n\toption\ttarget\t'\/sda1_partition'/g" /etc/config/fstab
-	sed -i "s/\toption\ttarget\t'\/mnt\/sda2'/\toption\tdevice\t'\/dev\/sda2'\n\toption\ttarget\t'\/rw_partition'/g" /etc/config/fstab
-	sed -i "s/\toption\ttarget\t'\/mnt\/sda3'/\toption\tdevice\t'\/dev\/sda3'\n\toption\ttarget\t'\/data'/g" /etc/config/fstab
-
-	for i in $(seq 1 3)
-	do
-		sda_line=$(grep -n "/dev/sda$i" /etc/config/fstab | cut -d: -f 1)
-		#echo $sda_line
-		line=$(($sda_line+3))
-		#echo $line
-		sed -i "${line}s/\toption\tenabled\t'0'/\toption\tenabled\t'1'/" /etc/config/fstab
-	done
-	cat /etc/config/fstab
-	sleep 5
-	block mount
+	if [ $flag_rw == true ]; then
+		rootro
+	else
+		block mount
+	fi
 }
 
 
 # Move all the required folders into the SSD partition and create link to them
 create_and_link_folders(){
 
-	echo "Creating and linking required folders"
+	if grep -q "/bin/mount -o remount,ro /" /etc/init.d/boot &&
+	   grep -q "/dev/root / ext4 ro" /proc/mounts; then
 
-	# ------------------IOTRONIC-------------------------
-	# Check if the folder exists
-	if [ ! -d /rw_partition/iotronic ]; then
-		mkdir /rw_partition/iotronic
-	fi
+		echo -e "\nRecreating folders on the device"
 
-	# Check if the folders are already linked
-	cd /var/lib/iotronic/
-	for folder in drivers patches plugins
-	do
-		if [[ -L "$folder" && -d "$folder" ]]; then
-			echo "/var/lib/iotronic/$folder is already a symlink to a directory"
-		else
-			mv /var/lib/iotronic/$folder /rw_partition/iotronic/
-			ln -sf /rw_partition/iotronic/$folder /var/lib/iotronic/$folder
+		# ------------------IOTRONIC-------------------------
+		if [ ! -d /rw_partition/iotronic ]; then
+			mkdir -p /rw_partition/iotronic
 		fi
-	done
-	# ----------------------------------------------------
 
-	# ----------------------OPKG--------------------------
-	# Necessary to make cross_check to list the installed packages
-	if [ ! -f /var/run/opkg.lock ]; then
-		ln -sf /var/run/opkg.lock /var/lock/opkg.lock
-	fi
-	# ----------------------------------------------------
+		#for folder in drivers patches plugins
+		for folder in drivers plugins
+		do
+			if [ ! -d "/rw_partition/iotronic/$folder" ]; then
+				mkdir /rw_partition/iotronic/$folder
+				cp /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/modules/$folder-manager/$folder.example.json /rw_partition/iotronic/$folder/$folder.json
+			fi
+		done
+		# ----------------------------------------------------
 
-	# --------------------LOGS----------------------------
-	# Check if the folder exists
-	if [ ! -d /rw_partition/log ]; then
+		# ----------------------OPKG--------------------------
+		# Necessary to make cross_check to list the installed packages
+		if [ ! -f /var/run/opkg.lock ]; then
+			ln -sf /var/run/opkg.lock /var/lock/opkg.lock
+		fi
+		# ----------------------------------------------------
 
-		mv /var/log /rw_partition/
-		ln -sf /rw_partition/log /var/
-	else
+		# --------------------LOGS----------------------------
+		# Check if the folder exists
+		if [ ! -d /rw_partition/log ]; then
+			mkdir -p /rw_partition/log
+		fi
+		# ----------------------------------------------------
+
+
+		# Verify all symlinks
+		# ----------------------------------------------------
+		cd /rw_partition/iotronic/
+		for folder in drivers plugins
+		do
+			if [[ -L "$folder" && -d "$folder" ]]; then
+				echo "$folder is already a symlink to a directory"
+			fi
+		done
+
 		folder=/var/log
 		if [[ -L "$folder" && -d "$folder" ]]; then
 			echo "$folder is already a symlink to a directory"
 		fi
+		# ----------------------------------------------------
+
+	else
+		echo -e "\nCreating and linking required folders"
+
+		# ------------------IOTRONIC-------------------------
+		# Check if the folder exists
+		if [ ! -d /rw_partition/iotronic ]; then
+			mkdir -p /rw_partition/iotronic
+		fi
+
+		# Check if the folders are already linked
+		cd /var/lib/iotronic/
+		#for folder in drivers patches plugins
+		for folder in drivers plugins
+		do
+			if [[ -L "$folder" && -d "$folder" ]]; then
+				echo "/var/lib/iotronic/$folder is already a symlink to a directory"
+			else
+				mv /var/lib/iotronic/$folder /rw_partition/iotronic/
+				ln -sf /rw_partition/iotronic/$folder /var/lib/iotronic/$folder
+			fi
+		done
+		# ----------------------------------------------------
+
+		# ----------------------OPKG--------------------------
+		# Necessary to make cross_check to list the installed packages
+		if [ ! -f /var/run/opkg.lock ]; then
+			ln -sf /var/run/opkg.lock /var/lock/opkg.lock
+		fi
+		# ----------------------------------------------------
+
+		# --------------------LOGS----------------------------
+		# Check if the folder exists
+		if [ ! -d /rw_partition/log ]; then
+
+			mv /var/log /rw_partition/
+			ln -sf /rw_partition/log /var/
+		else
+			folder=/var/log
+			if [[ -L "$folder" && -d "$folder" ]]; then
+				echo "$folder is already a symlink to a directory"
+			fi
+		fi
+		# ----------------------------------------------------
 	fi
-	# ----------------------------------------------------
 }
 
 
 # Turn into read-only fs
 turn_into_ro(){
 
-	echo "Turning the fs into read-only"
+	echo -e "\nTurning the fs into read-only"
 
 	if grep -q "/bin/mount -o remount,ro /" /etc/init.d/boot; then
 		echo "Remount already set"
@@ -231,7 +298,7 @@ disclaimer () {
 
 	echo -e "This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 	GNU General Public License for more details."
 
 }
@@ -247,65 +314,65 @@ returngigs () {
 	#if [ $size -gt 63000000000 ]
 	if [ $size -gt 63000000 ]
 
-	  then
+	 then
 
-	    sizetoformat=+'2.1GB'
-	    #echo "Size partition: $sizetoformat"
-	    return 0
+	  sizetoformat=+'2.1GB'
+	  #echo "Size partition: $sizetoformat"
+	  return 0
 
 	#elif [ $size -lt 32500000000 -a $size -gt 31000000000 ]
 	elif [ $size -lt 32500000 -a $size -gt 31000000 ]
 
-	  then
+	 then
 
-	    sizetoformat=+'2.1GB'
-	    return 0
+	  sizetoformat=+'2.1GB'
+	  return 0
 
 
 	#elif [ $size -lt 16500000000 -a $size -gt 15000000000 ]
 	elif [ $size -lt 16500000 -a $size -gt 15000000 ]
 
-	  then
+	 then
 
-	    sizetoformat=+'14500MB'
-	    return 0
+	  sizetoformat=+'14500MB'
+	  return 0
 
 	#elif [ $size -lt 8500000000 -a $size -gt 7000000000 ]
 	elif [ $size -lt 8500000 -a $size -gt 7000000 ]
 
-	  then
+	 then
 
-	    sizetoformat=+'7000MB'
-	    return 0
+	  sizetoformat=+'7000MB'
+	  return 0
 
 	#elif [ $size -lt 4500000000 -a $size -gt 3000000000 ]
 	elif [ $size -lt 4500000 -a $size -gt 3000000 ]
 
-	  then
+	 then
 
-	    sizetoformat=+'3000MB'
-	    return 0
+	  sizetoformat=+'3000MB'
+	  return 0
 
 	#elif [ $size -lt 2500000000 -a $size -gt 1000000000 ]
 	elif [ $size -lt 2500000 -a $size -gt 1000000 ]
 
-	  then
+	 then
 
-	    sizetoformat=+'1000MB'
-	    return 0
+	  sizetoformat=+'1000MB'
+	  return 0
 
 	#elif [ $size -lt 1500000000 -a $size -gt 900000000 ]
 	elif [ $size -lt 1500000 -a $size -gt 900000 ]
 
-	  then
+	 then
 
-	    sizetoformat=+'512M'
-	    return 0
+	  sizetoformat=+'512M'
+	  return 0
 
 	else
 
-	    echo "Drive size mismatch ! ! ! Terminating the program..."
-	    return 1
+	  echo "Drive size mismatch ! ! ! Terminating the program..."
+	  return 1
 
 	fi
 
@@ -316,7 +383,7 @@ umountsda1 () {
 	if `grep -qs '/dev/sda1' /proc/mounts`
 	then
 
-	    umount /dev/sda1
+	  umount /dev/sda1
 
 	fi
 }
@@ -327,7 +394,7 @@ umountallsda () {
 	if `df | grep -qs sda`
 	then
 
-	    df | grep sda | awk {'print $1'} | xargs umount
+	  df | grep sda | awk {'print $1'} | xargs umount
 
 	fi
 
@@ -338,7 +405,7 @@ swapoffallsda () {
 	if `cat /proc/swaps | grep -qs sda`
 	then
 
-	    #cat /proc/swaps | grep sda | awk {'print $1'} | xargs swapoff
+	  #cat /proc/swaps | grep sda | awk {'print $1'} | xargs swapoff
 		swapoff -a
 
 	fi
@@ -347,67 +414,67 @@ swapoffallsda () {
 
 formatssd () {
 
-        sleep 5
+    sleep 5
 
-        #Killing all existing blocks on the device
-        lsof | grep /dev/sda1 | grep -v sh | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+    #Killing all existing blocks on the device
+    lsof | grep /dev/sda1 | grep -v sh | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
 
-        #Umounts all the sda partitions
-        umountallsda
+    #Umounts all the sda partitions
+    umountallsda
 
-        echo ""
-        echo "Low level formatting the drive..."
-        echo ""
+    echo ""
+    echo "Low level formatting the drive..."
+    echo ""
 
-        #Low level formatting
-        dd if=/dev/zero of=/dev/sda bs=512 count=1
+    #Low level formatting
+    dd if=/dev/zero of=/dev/sda bs=512 count=1
 
-        # Creation of the primary and swap partitions
-        # Feeding inputs to fdisk in non-interactive mode
+    # Creation of the primary and swap partitions
+    # Feeding inputs to fdisk in non-interactive mode
 
-        echo ""
-        echo "Partitioning drive..."
-        echo ""
+    echo ""
+    echo "Partitioning drive..."
+    echo ""
 
-        (echo n; echo p; echo 1; echo ;echo $1; echo w) | fdisk /dev/sda
-        (echo n; echo p; echo 2; echo ;echo $1; echo w) | fdisk /dev/sda
-        (echo n; echo p; echo 3; echo ;echo ; echo w) | fdisk /dev/sda
+    (echo n; echo p; echo 1; echo ;echo $1; echo w) | fdisk /dev/sda
+    (echo n; echo p; echo 2; echo ;echo $1; echo w) | fdisk /dev/sda
+    (echo n; echo p; echo 3; echo ;echo ; echo w) | fdisk /dev/sda
 
-        partx -u /dev/sda
+    partx -u /dev/sda
 
-        sleep 20
+    sleep 20
 
-        umountallsda
+    umountallsda
 
-        sleep 10
+    sleep 10
 
-        echo ""
-        echo "Formatting partition 01..."
-        echo ""
+    echo ""
+    echo "Formatting partition 01..."
+    echo ""
 
-        mkfs.f2fs -l driveSSD-01 /dev/sda1
+    mkfs.f2fs -l driveSSD-01 /dev/sda1
 
-        sleep 10
+    sleep 10
 
-        echo ""
-        echo "Formatting partition 02..."
-        echo ""
+    echo ""
+    echo "Formatting partition 02..."
+    echo ""
 
 		mkfs.f2fs -l driveSSD-02 /dev/sda2
 
-        sleep 10
+    sleep 10
 
-        echo ""
-        echo "Formatting partition 03..."
-        echo ""
+    echo ""
+    echo "Formatting partition 03..."
+    echo ""
 
-        mkfs.f2fs -l driveSSD-03 /dev/sda3
+    mkfs.f2fs -l driveSSD-03 /dev/sda3
 
 }
 
 formatsdcard () {
 
-  	sleep 5
+ 	sleep 5
 
 	#Killing all existing blocks on the device
 	lsof | grep /dev/sda1 | grep -v sh | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
@@ -433,7 +500,7 @@ formatsdcard () {
 	echo ""
 
 	(echo n; echo p; echo 1; echo ;echo $1; echo w) | fdisk /dev/sda
-    (echo n; echo p; echo 2; echo ;echo ; echo t; echo 2; echo 82; echo w) | fdisk /dev/sda
+  (echo n; echo p; echo 2; echo ;echo ; echo t; echo 2; echo 82; echo w) | fdisk /dev/sda
 
 	sleep 20
 
@@ -534,26 +601,26 @@ formatvfatoverlay () {
 
 logo () {
 cat <<"EOT"
-    _                         _
-   / \   _ __ __ _ _ __   ___(_)_ __   ___
-  / _ \ | '__/ _` | '_ \ / __| | '_ \ / _ \
+  _             _
+  / \  _ __ __ _ _ __  ___(_)_ __  ___
+ / _ \ | '__/ _` | '_ \ / __| | '_ \ / _ \
  / ___ \| | | (_| | | | | (__| | | | | (_) |
-/_/   \_\_|  \__,_|_| |_|\___|_|_| |_|\___/
+/_/  \_\_| \__,_|_| |_|\___|_|_| |_|\___/
 
- ___           _        _ _
-|_ _|_ __  ___| |_ __ _| | | ___ _ __
+ ___      _    _ _
+|_ _|_ __ ___| |_ __ _| | | ___ _ __
  | || '_ \/ __| __/ _` | | |/ _ \ '__|
- | || | | \__ \ || (_| | | |  __/ |
+ | || | | \__ \ || (_| | | | __/ |
 |___|_| |_|___/\__\__,_|_|_|\___|_|
 
 EOT
 }
 
 welcome () {
-	  logo
+	 logo
 
-      echo "Welcome to Arancino OS installation"
-      echo ""
+   echo "Welcome to Arancino OS installation"
+   echo ""
 }
 
 fstabclean () {
@@ -577,22 +644,22 @@ cat <<EOF
 #startoverlayconfig
 
 config 'mount'
-        option  target  '/'
-        option  uuid    $uuid1
-        option  enabled '1'
-        option  options rw,sync
-        option  enabled_fsck     0
+    option target '/'
+    option uuid  $uuid1
+    option enabled '1'
+    option options rw,sync
+    option enabled_fsck   0
 
 config 'mount'
-        option  target  '/mnt/sda2'
-        option  uuid    $uuid2
-        option  enabled '1'
+    option target '/mnt/sda2'
+    option uuid  $uuid2
+    option enabled '1'
 
 config 'mount'
-        option  target  '/data'
-        option  uuid    $uuid3
-        option  enabled '1'
-        option  options rw,async
+    option target '/data'
+    option uuid  $uuid3
+    option enabled '1'
+    option options rw,async
 
 #endoverlayconfig
 EOF
@@ -787,8 +854,8 @@ revert () {
 
 killprocesses () {
 	echo ""
-        echo "Killing process before start..."
-        echo ""
+    echo "Killing process before start..."
+    echo ""
 	pkill monit
 	pkill influxd
 	pkill mosquitto
@@ -797,7 +864,7 @@ killprocesses () {
 
 removePrevMount () {
 	if (`grep -qs 'startoverlayconfig' /etc/config/fstab`)
-        then
+    then
 		sed '/#startoverlayconfig/,/#endoverlayconfig/d' /etc/config/fstab > /etc/config/fstab.new
 		mv /etc/config/fstab.new /etc/config/fstab
 	fi
@@ -847,39 +914,30 @@ shift;
 Usage: $0 [<script-option>...]
 
 script-option:
-	-i           interactive mode
-	-r           revert extroot configuration to sdcard
-	-o					 initizializing overlay on filesystem
-	-p           new unattended setup
-	-h | --help  display this help
+	-i            interactive mode
+	-r            revert extroot configuration to sdcard
+	-o            initizializing overlay on filesystem
+	-p            new unattended setup
+	-h | --help   display this help
 
 EOF
 	exit 1
 }
 
-#---------------------PRELIMINARY-CHECK--------------
-
-if ! `block info | grep -qs '/dev/sda'`
-then
-
-	echo ""
-	echo "Can't mount SSD drive, check your system configuration !"
-	echo "Can't mount SSD drive, check your system configuration !" > /dev/kmsg
-	echo ""
-
-	exit 1
-fi
-
 #--------------------------------MENU-START----------------------------------------
 
 size=`fdisk -l | grep "Disk /dev/sda" | awk {'print $5'}`
+
 if ([ "$REVERT" == "1" ])
 then
-
 		revert
 
 elif ([ "$NEW_MODE" == "1" ])
 then
+		if [ -z $size ]; then
+			echo "Please plug a usb hard drive and relaunch the procedure"
+			exit 1
+		fi
 
 		echo "Starting unattended setup....."
 		flag_preserve_data=false
@@ -893,26 +951,25 @@ then
 
 elif [ "$SET_CHECK_OVERLAY" == "1" ]
 then
-
 		set_check_overlay
 
 elif ([ "$INTERACTIVE" == "1" ])
 then
 
-    clear
+  clear
 
-    disclaimer
+  disclaimer
 
-    echo ""
-    read -p "Press [Enter] key to continue..."
-    echo ""
+  echo ""
+  read -p "Press [Enter] key to continue..."
+  echo ""
 
-    clear
+  clear
 
 	while [ "$done" != "true" ]
 	do
 
-	  	welcome
+	 	welcome
 
 			echo "Arancino installation menu"
 			echo ""
@@ -924,11 +981,11 @@ then
 			echo "0. Exit"
 
 
-      echo " "
-      echo "Choose : "
-      echo " "
+   echo " "
+   echo "Choose : "
+   echo " "
 
-      read scelta
+   read scelta
 
 			case $scelta in
 
@@ -945,8 +1002,14 @@ then
 				while [ $p != 0 ]
 
 				do
-                                        size=`fdisk -l | grep "Disk /dev/sda" | awk {'print $5'}`
-                                        if (`block info | grep -qs '/dev/sda'`) || [ $size -gt 1000000 ]
+                    size=`fdisk -l | grep "Disk /dev/sda" | awk {'print $5'}`
+
+					if [ -z $size ]; then
+						echo "Please plug a usb hard drive and relaunch the procedure"
+						exit 1
+					fi
+
+                    if (`block info | grep -qs '/dev/sda'`) || [ $size -gt 1000000 ]
 					then
 						echo ""
 						echo "Drive discovered..,."
@@ -964,17 +1027,17 @@ then
 								initialize_configure
 								;;
 							[nN]*)
-								  echo ""
-								  echo "Good Bye for now..."
-								  echo ""
+								 echo ""
+								 echo "Good Bye for now..."
+								 echo ""
 
-								  p=0
-							    ;;
-							    *)
-								  echo ""
-								  echo "You have to make a choice !"
-								  echo ""
-							    ;;
+								 p=0
+							  ;;
+							  *)
+								 echo ""
+								 echo "You have to make a choice !"
+								 echo ""
+							  ;;
 							esac
 						else
 							#statements
@@ -1056,6 +1119,11 @@ then
 				#----------------- Choice-4---------------------
 				# Finalize SD ReadOnly configuration
 				4)
+				if [ -z $size ]; then
+					echo "Please plug a usb hard drive and relaunch the procedure"
+					exit 1
+				fi
+
 				echo ""
 				echo "Updating files and folders..."
 				echo ""
@@ -1119,4 +1187,14 @@ then
 			esac
 
 	done
+#fi
+elif ! `block info | grep -qs '/dev/sda'`
+then
+
+	echo ""
+	echo "Can't mount SSD drive, check your system configuration !"
+	echo "Can't mount SSD drive, check your system configuration !" > /dev/kmsg
+	echo ""
+
+	exit 1
 fi
