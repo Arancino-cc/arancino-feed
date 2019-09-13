@@ -62,6 +62,7 @@ define Package/arancino-rpi-scripts/install
 	#$(INSTALL_BIN) ./files/usr/bin/wdController $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/rootro $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/rootrw $(1)/usr/bin
+	$(INSTALL_BIN) ./files/usr/bin/board_bkp_rest $(1)/usr/bin
 
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
