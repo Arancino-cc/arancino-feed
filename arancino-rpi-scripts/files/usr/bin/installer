@@ -17,7 +17,7 @@
 #
 # Authors: Domenico La Fauci, Carmelo Romeo, Arturo Rinaldi
 # Emails: mimmo@smartme.io, carmelo@smartme.io, arturo@smartme.io
-# Date : 09-09-2019
+# Date : 16-09-2019
 #
 
 # has_sd=`mount | grep ^/dev/sda | grep 'on /overlay'`
@@ -28,21 +28,29 @@ part1_size=2 #dimension of the sda1
 part2_size=2 #dimension of the sda2
 
 fs_type="f2fs" #f2fs, ext4
-flag_preserve_data=true
+flag_preserve_data=false
 nodered_dir=/opt/shm-gateway/node-red
 # --------------------------
 
 # Syncing the extroot filesystem into /rom
 rsync_on_rom(){
 
-	echo "Syncing the extroot filesystem into /rom"
+	if grep -q "/bin/mount -o remount,ro /" /etc/init.d/boot ||
+	   grep -q "/dev/root / ext4 ro" /proc/mounts; then
+	   
+	   echo "It is not possible to sync the extroot filesystem into /rom (using read-only now)"
+	   exit 1
 
-	mount -o remount,rw /dev/root
-	opkg update
-	opkg install rsync
-	rsync --checksum --recursive --one-file-system --links --perms -v --delete-delay --exclude=/data --include "/mnt" / /rom
+	else
+		echo "Syncing the extroot filesystem into /rom"
 
-	sed -i '/#startoverlayconfig/,/#endovlerlayconfig/d' /rom/etc/config/fstab
+		mount -o remount,rw /dev/root
+		opkg update
+		opkg install rsync
+		rsync --checksum --recursive --one-file-system --links --perms -v --delete-delay --exclude=/data --include "/mnt" / /rom
+
+		sed -i '/#startoverlayconfig/,/#endovlerlayconfig/d' /rom/etc/config/fstab
+	fi
 }
 
 
@@ -176,7 +184,7 @@ update_fstab_and_mount(){
 # Move all the required folders into the SSD partition and create link to them
 create_and_link_folders(){
 
-	if grep -q "/bin/mount -o remount,ro /" /etc/init.d/boot &&
+	if grep -q "/bin/mount -o remount,ro /" /etc/init.d/boot ||
 	   grep -q "/dev/root / ext4 ro" /proc/mounts; then
 
 		echo -e "\nRecreating folders on the device"
