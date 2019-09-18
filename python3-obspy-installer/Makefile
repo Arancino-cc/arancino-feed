@@ -19,7 +19,7 @@ define Package/$(PKG_NAME)
   SECTION:=lang
   CATEGORY:=Languages
   TITLE:=python3-obspy
-  DEPENDS:=+python3 +libxslt +libexslt +libfreetype +libpng16 +libstdcpp
+  DEPENDS:=+python3 +libxslt +libexslt +libfreetype +libstdcpp
 endef
 
 define Build/Compile
