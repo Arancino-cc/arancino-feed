@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-rpi-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=51
+PKG_RELEASE:=52
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -62,6 +62,7 @@ define Package/arancino-rpi-scripts/install
 	#$(INSTALL_BIN) ./files/usr/bin/wdController $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/rootro $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/rootrw $(1)/usr/bin
+	$(INSTALL_BIN) ./files/usr/bin/upgrade-kernel $(1)/usr/bin
 
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d

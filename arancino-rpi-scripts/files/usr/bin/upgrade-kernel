@@ -1,0 +1,66 @@
+#!/bin/sh
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+# Authors: Arturo Rinaldi
+# Emails: arturo@smartme.io
+# Date : 16-09-2019
+#
+
+KOPTIONS="--force-depends --force-overwrite --force-checksum"
+
+# check for kernel url valid string
+[ -z $1 ] && echo "not a valid kernel URL !" && exit 0
+
+KERNEL_NAME=$(basename $1)
+
+# downloading kernel main package with CRC
+wget -P /tmp $1
+opkg install /tmp/${KERNEL_NAME}
+
+# updating repositories
+opkg update
+
+# list of modules to drop while upgrading
+LIST="kmod-can kmod-mmc kmod-usb-net kmod-usb-serial"
+
+# updating kernel modules
+opkg list-upgradable | grep kmod- | awk {'print $1'} > /tmp/modules-to-upgrade
+
+for t in $LIST
+do
+    sed -i /$t/d /tmp/modules-to-upgrade
+done
+
+# updating first batch of kernel modules
+cat /tmp/modules-to-upgrade | xargs opkg ${KOPTIONS} upgrade
+
+# upgrading modules removed from list by sed step
+opkg upgrade kmod-can-raw kmod-usb-net-asix kmod-usb-net-asix-ax88179 kmod-usb-net-rndis kmod-usb-net-cdc-ether
+
+# removing useless module
+opkg remove kmod-max310x-spi 2> /dev/null
+
+# updating actual kernel image
+CHECK_KIMAGE=$(opkg list-installed | grep -qs kernel-image)
+
+if $CHECK_KIMAGE
+then
+    opkg upgrade kernel-image --force-overwrite
+else
+    opkg install kernel-image --force-overwrite
+fi
+
+# rebooting
+reboot && exit
