@@ -5,7 +5,7 @@ START=99
 STOP=0
 
 USE_PROCD=1
-SCRIPT="/usr/lib/python3.7/site-packages/pyagriculture.py"
+SCRIPT="/usr/bin/pyAgriculture.py"
 
 start_service() {
 	procd_open_instance
