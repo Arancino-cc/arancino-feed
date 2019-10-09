@@ -6,7 +6,8 @@
 config_load dhcp
 
 set_dhcp_interface() {
-	uci set dhcp.interface='lo,wlan0'
+	uci set dhcp.interface='lo,wwan'
+	uci set dhcp.@dnsmasq[0].rebind_protection='0'
 	uci commit dhcp
 	exit 0
 }

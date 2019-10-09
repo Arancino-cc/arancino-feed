@@ -3,4 +3,6 @@
 
 #wifi-live-or-reset
 
+sh /usr/local/bin/fix_sta_ap.sh > /dev/null &
+
 exit 0

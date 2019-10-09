@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-hlk-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=1
+PKG_RELEASE:=6
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -17,6 +17,7 @@ define Package/arancino-hlk-scripts
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Custom Arancino HLK support package
+  DEPENDS:=+base-files
   DEFAULT:=m
 endef
 
@@ -36,17 +37,19 @@ define Package/arancino-hlk-scripts/install
 	#$(INSTALL_DIR) $(1)/etc/smartme
 
 	# /etc
-	#$(INSTALL_DATA) ./files/etc/rc.local $(1)/etc
 
 	# /etc/config DIR
 	$(INSTALL_CONF) ./files/etc/config/smartme $(1)/etc/config
 	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config
+	$(INSTALL_CONF) ./files/etc/config/wireless.ap-only $(1)/etc/config
+	$(INSTALL_CONF) ./files/etc/config/wireless.ap+sta $(1)/etc/config
 
 	# /usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/smartme-wifi-connect $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/wifi-live-or-reset $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/wifi-reload $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/wifi-reset-and-reboot $(1)/usr/bin
+	$(INSTALL_BIN) ./files/usr/bin/fix_sta_ap.sh $(1)/usr/bin
 
 	# /etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
@@ -60,6 +63,10 @@ define Package/arancino-hlk-scripts/postinst
 if [ -e $${IPKG_INSTROOT}/etc/config/wireless ]
 then
 	sed -i -e "s/LinkIt.*/SmartME\'/g" $${IPKG_INSTROOT}/etc/config/wireless
+fi
+if [ -e $${IPKG_INSTROOT}/etc/rc.local ]
+then
+	sed -i -e '$$i \sh /usr/bin/fix_sta_ap.sh > /dev/null &\n' $${IPKG_INSTROOT}/etc/rc.local
 fi
 if [ -e $${IPKG_INSTROOT}/etc/shadow ]
 then
