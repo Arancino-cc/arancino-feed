@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-linkit-scripts
 PKG_VERSION:=1.0
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -36,12 +36,10 @@ define Package/arancino-linkit-scripts/install
 	#$(INSTALL_DIR) $(1)/etc/smartme
 
 	# /etc
-	#$(INSTALL_DATA) ./files/etc/rc.local $(1)/etc
 
 	# /etc/config DIR
 	$(INSTALL_CONF) ./files/etc/config/smartme $(1)/etc/config
 	$(INSTALL_CONF) ./files/etc/config/wireless $(1)/etc/config
-#	$(INSTALL_CONF) ./files/etc/config/mcuiocfg $(1)/etc/config
 
 	# /usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/smartme-wifi-connect $(1)/usr/bin
@@ -53,8 +51,6 @@ define Package/arancino-linkit-scripts/install
 	$(INSTALL_BIN) ./files/etc/init.d/rename-wifi-if-access-point $(1)/etc/init.d
 	#$(INSTALL_BIN) ./files/etc/init.d/generate_new_gpg_key $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/handle_wifi_reset $(1)/etc/init.d
-#	$(INSTALL_BIN) ./files/etc/init.d/can-setup $(1)/etc/init.d
-#	$(INSTALL_BIN) ./files/etc/init.d/mcuio $(1)/etc/init.d
 
 	$(CP) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
 endef
@@ -64,6 +60,10 @@ define Package/arancino-linkit-scripts/postinst
 if [ -e $${IPKG_INSTROOT}/etc/config/wireless ]
 then
 	sed -i -e "s/LinkIt.*/SmartME\'/g" $${IPKG_INSTROOT}/etc/config/wireless
+fi
+if [ -e $${IPKG_INSTROOT}/etc/rc.local ]
+then
+	sed -i -e '$$i \sh /usr/bin/fix_sta_ap.sh > /dev/null &\n' $${IPKG_INSTROOT}/etc/rc.local
 fi
 if [ -e $${IPKG_INSTROOT}/etc/shadow ]
 then
