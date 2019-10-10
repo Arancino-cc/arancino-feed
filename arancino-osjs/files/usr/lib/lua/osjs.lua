@@ -732,7 +732,7 @@ function api_request(request, response, meth, iargs)
     data = iface_status(iargs["device"])
   elseif meth == "netinfo" then
     data = {
-      deviceinfo = sys.net.deviceinfo(),
+      deviceinfo = sys.net.devices(),
       ifconfig = json.decode(console("sh " .. ROOTDIR .. "/bin/arancino-ifconfig.sh"))
     }
   elseif meth == "iwinfo" then

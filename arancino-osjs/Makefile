@@ -9,15 +9,17 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-osjs
 PKG_VERSION:=1.0
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/arancino-osjs
-  SECTION:=utils
-  CATEGORY:=Utilities
+  SECTION:=luci
+  CATEGORY:=LuCI
+  SUBMENU:=3. Applications
   TITLE:=Custom Arancino Osjs support package
   DEFAULT:=m
+  DEPENDS:=+luci +luci-lib-json +uhttpd-mod-lua +lua-coxpcall +lua-wsapi-base +lua-wsapi-xavante +lua-xavante +luafilesystem +iw-full
 endef
 
 define Build/Compile
@@ -41,11 +43,33 @@ then
 	# make the webserver ponting to /osjs instead of /www
 	sed -i -e 's/www/osjs\/dist/g' $${IPKG_INSTROOT}/etc/config/uhttpd
 
-	# Linking LUci
-	mkdir -p $${IPKG_INSTROOT}//osjs/dist/luci
-	ln -sf /www/index.html $${IPKG_INSTROOT}//osjs/dist/luci/index.html
-	ln -sf /www/luci-static $${IPKG_INSTROOT}//osjs/dist/luci-static
-	ln -sf /www/cgi-bin/luci $${IPKG_INSTROOT}//osjs/dist/cgi-bin/luci
+	# Linking LuCI
+	mkdir -p $${IPKG_INSTROOT}/osjs/dist/luci
+	ln -sf /www/index.html $${IPKG_INSTROOT}/osjs/dist/luci/index.html
+	ln -sf /www/luci-static $${IPKG_INSTROOT}/osjs/dist/luci-static
+	ln -sf /www/cgi-bin/luci $${IPKG_INSTROOT}/osjs/dist/cgi-bin/luci
+
+	# Restarting uHttp server
+	/etc/init.d/uhttpd reload
+	/etc/init.d/uhttpd restart
+fi
+exit 0
+endef
+
+define Package/arancino-osjs/postrm
+#!/bin/sh
+if [ -e /etc/config/uhttpd ] && [ -d /osjs ]
+then
+	# restoring orinal entry to /www
+	sed -i -e 's/osjs\/dist/www/g' /etc/config/uhttpd /etc/config/uhttpd
+
+	# cleaning Arancino-OsJs files
+	# rm -rf /usr/lib/lua/osjs.lua
+	rm -rf /osjs
+
+	# Restarting uHttp server
+	/etc/init.d/uhttpd reload
+	/etc/init.d/uhttpd restart
 fi
 exit 0
 endef
