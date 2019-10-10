@@ -13,7 +13,7 @@ config wifi-iface 'wifinet0'
         option mode 'ap'
         option network 'lan'
         option encryption 'psk2'
-        option ssid 'SmartME-40D63C1205E6'
+        option ssid 'SmartME'
         option key 'smartme123'
 
 config wifi-iface 'wifinet1'
