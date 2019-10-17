@@ -48,10 +48,6 @@ then
 	ln -sf /www/index.html $${IPKG_INSTROOT}/osjs/dist/luci/index.html
 	ln -sf /www/luci-static $${IPKG_INSTROOT}/osjs/dist/luci-static
 	ln -sf /www/cgi-bin/luci $${IPKG_INSTROOT}/osjs/dist/cgi-bin/luci
-
-	# Restarting uHttp server
-	/etc/init.d/uhttpd reload
-	/etc/init.d/uhttpd restart
 fi
 exit 0
 endef
@@ -66,10 +62,6 @@ then
 	# cleaning Arancino-OsJs files
 	# rm -rf /usr/lib/lua/osjs.lua
 	rm -rf /osjs
-
-	# Restarting uHttp server
-	/etc/init.d/uhttpd reload
-	/etc/init.d/uhttpd restart
 fi
 exit 0
 endef
