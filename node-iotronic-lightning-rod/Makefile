@@ -6,14 +6,14 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.3.7
-PKG_RELEASE:=2
+PKG_VERSION:=2.3.9
+PKG_RELEASE:=1
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=ssh://git@git.smartme.io:20022/consulting/sacertis/iotronic-lightning-rod.git
-PKG_HASH:=d0454d10080018936fb89b744770cb17c4f1061b
+PKG_HASH:=88b943ff2447438d2a74ea76cd6472f824cd2a18
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_HASH)
 
