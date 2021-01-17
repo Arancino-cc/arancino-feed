@@ -1,0 +1,25 @@
+diff --git a/package.json b/package.json
+index d19fa5a..107c31d 100644
+--- a/package.json
++++ b/package.json
+@@ -6,11 +6,6 @@
+   "directories": {
+     "doc": "docs"
+   },
+-  "scripts": {
+-    "test": "node lightning-rod.js",
+-    "postinstall": "./scripts/postinst",
+-    "uninstall": "./scripts/postuninst"
+-  },
+   "dependencies": {
+     "autobahn": "<=18.10.2",
+     "ws":"<=6.1.0",
+@@ -27,6 +22,8 @@
+     "python-shell":"0.5.0",
+     "net":"1.0.2",
+     "lsof":"0.1.0",
++	 "bufferutil":"3.0.4",
++	 "utf-8-validate":"4.0.1",
+     "cbor":"4.3.0"
+   },
+   "repository": {
