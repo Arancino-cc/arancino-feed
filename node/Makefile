@@ -92,7 +92,7 @@ define Build/Prepare
 	$(call Build/Prepare/Default)
 	$(eval $(call Download,nodebin))
 	$(TAR) -xvf $(DL_DIR)/$(NODEJS) -C $(STAGING_DIR_HOSTPKG) --strip-components=1
-	$(STAGING_DIR_HOSTPKG)/bin/npm update npm -g $(STAGING_DIR_HOSTPKG)/lib/node_modules
+	$(STAGING_DIR_HOSTPKG)/bin/npm update npm@6.7.0 -g $(STAGING_DIR_HOSTPKG)/lib/node_modules
 endef
 
 define Build/InstallDev

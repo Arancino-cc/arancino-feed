@@ -7,17 +7,17 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.3.9
-PKG_RELEASE:=1
+PKG_RELEASE:=3
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=ssh://git@git.smartme.io:20022/consulting/sacertis/iotronic-lightning-rod.git
 PKG_HASH:=9909c665baf98a7e0a1056b0038270f4ddce4e87
+PKG_SHORT_HASH:=9909c665
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-g$(PKG_SHORT_HASH).tar.gz
+PKG_SOURCE_URL:=ssh://git@git.smartme.io:20022/consulting/sacertis/iotronic-lightning-rod.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=$(PKG_HASH)
 
-PKG_BUILD_DEPENDS:=node libc libpthread
 PKG_NODE_VERSION:=6.11.4
 PKG_USE_MIPS16:=0
 
@@ -29,7 +29,7 @@ define Package/node-iotronic-lightning-rod
   CATEGORY:=Languages
   TITLE:=Stack4Things Lightning-rod
   URL:=https://www.npmjs.org/package/iotronic-lightning-rod
-  DEPENDS:=+node +libfuse +libpthread +libc +gdb +node-lsof +patch
+  DEPENDS:=+node +libfuse +libpthread +libc +gdb +node-lsof +patch +logrotate
 endef
 
 define Package/node-iotronic-lightning-rod/description
@@ -38,9 +38,7 @@ endef
 
 NODEJS_CPU:=$(subst powerpc,ppc,$(subst aarch64,arm64,$(subst x86_64,x64,$(subst i386,ia32,$(ARCH)))))
 
-define Build/Prepare
-        $(INSTALL_DIR) $(PKG_BUILD_DIR)
-endef
+TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include/fuse
 
 define Build/Compile
 	$(MAKE_VARS) \
@@ -50,7 +48,7 @@ define Build/Compile
 	npm_config_cache=$(TMP_DIR)/npm-cache \
 	npm_config_tmp=$(TMP_DIR)/npm-tmp \
 	PREFIX="$(PKG_INSTALL_DIR)/usr/" \
-	$(STAGING_DIR_HOSTPKG)/bin/npm install --build-from-source --target_arch=$(NODEJS_CPU) -g $(DL_DIR)/$(PKG_SOURCE)
+	$(STAGING_DIR_HOSTPKG)/bin/npm install --build-from-source --target_arch=$(NODEJS_CPU) -g $(PKG_BUILD_DIR)
 	rm -rf $(TMP_DIR)/npm-tmp
 	rm -rf $(TMP_DIR)/npm-cache
 endef
@@ -65,7 +63,7 @@ define Package/node-iotronic-lightning-rod/install
 	chmod +x $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/utils/install/arancino/*
 
 	# Configure IoTronic ENV
-	mkdir -p $(1)/var/lib/iotronic/
+	mkdir -p $(1)/var/lib/iotronic
 	mkdir -p $(1)/var/lib/iotronic/plugins
 	mkdir -p $(1)/var/lib/iotronic/drivers
 	
@@ -74,8 +72,8 @@ define Package/node-iotronic-lightning-rod/install
 	$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
 
 	mkdir -p $(1)/usr/bin
-	$(LN) /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/configure_LR_arancino.sh $(1)/usr/bin/configure_LR_arancino
-	$(LN) /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/board_bkp_rest.sh $(1)/usr/bin/board_bkp_rest
+	$(LN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/configure_LR_arancino.sh $(1)/usr/bin/configure_LR_arancino
+	$(LN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/board_bkp_rest.sh $(1)/usr/bin/board_bkp_rest
 
 	# Not overwrite settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/settings.example.json $(1)/var/lib/iotronic/settings.json
@@ -83,10 +81,11 @@ define Package/node-iotronic-lightning-rod/install
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/modules/drivers-manager/drivers.example.json $(1)/var/lib/iotronic/drivers/drivers.json
 
 	# Configure IoTronic Log
+	mkdir -p $(1)/var/log/iotronic
 	mkdir -p $(1)/var/log/iotronic/plugins
 	mkdir -p $(1)/etc/logrotate.d
 	touch $(1)/var/log/iotronic/lightning-rod.log
-	$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
+	$(CP) ./files/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 
 	# configure init.d 
 	$(INSTALL_DIR) $(1)/etc/init-cfg/
@@ -97,7 +96,7 @@ define Package/node-iotronic-lightning-rod/install
 	$(CP) ./files/etc/monit.d/* $(1)/etc/monit.d
 
 	# configure pluginExec
-	$(LN) /usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/pluginExec/create_plugin_env $(1)/usr/bin/create_plugin_env
+	$(LN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/pluginExec/create_plugin_env $(1)/usr/bin/create_plugin_env
 
 
 endef
