@@ -12,7 +12,7 @@ PKG_VERSION:=1.1.1
 PKG_RELEASE:=1
 
 include $(INCLUDE_DIR)/package.mk
-include $(TOPDIR)/feeds/packages/lang/python/python3-package.mk
+$(call include_mk, python3-package.mk)
 
 define Package/$(PKG_NAME)
   SUBMENU:=Python
