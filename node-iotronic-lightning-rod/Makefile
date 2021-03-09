@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.3.9
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
@@ -85,6 +85,7 @@ define Package/node-iotronic-lightning-rod/install
 	mkdir -p $(1)/var/log/iotronic/plugins
 	mkdir -p $(1)/etc/logrotate.d
 	touch $(1)/var/log/iotronic/lightning-rod.log
+	# $(CP) $(PKG_BUILD_DIR)/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 	$(CP) ./files/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 
 	# configure init.d 
