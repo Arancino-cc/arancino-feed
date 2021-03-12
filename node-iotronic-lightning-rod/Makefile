@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.3.9
-PKG_RELEASE:=5
+PKG_RELEASE:=6
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
