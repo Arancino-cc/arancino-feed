@@ -1,0 +1,22 @@
+diff --git a/package.json b/package.json
+index 59ad4b5..d699471 100644
+--- a/package.json
++++ b/package.json
+@@ -13,14 +13,14 @@
+     "crypto-js": ">= 3.1.8",
+     "int64-buffer": ">= 0.1.9",
+     "msgpack-lite": ">= 0.1.26",
+-    "cbor": ">= 3.0.0",
++    "cbor": "4.3.0",
+     "tweetnacl": ">= 0.14.3",
+     "when": ">= 3.7.7",
+     "ws": ">= 1.1.4"
+   },
+   "optionalDependencies": {
+-    "bufferutil": ">= 1.2.1",
+-    "utf-8-validate": ">= 1.2.1"
++    "bufferutil": "4.3.0",
++    "utf-8-validate": "1.2.1"
+   },
+   "devDependencies": {
+     "browserify": ">= 13.1.1",
