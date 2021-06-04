@@ -10,7 +10,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=shellinabox
 PKG_VERSION:=2.20
-PKG_RELEASE:=10
+PKG_RELEASE:=11
 
 PKG_INSTALL:=1
 
@@ -44,7 +44,7 @@ define Package/shellinabox/description
 endef
 
 define Build/Configure
-	$(call Build/Configure/Default,--disable-runtime-loading)
+	$(call Build/Configure/Default,--disable-runtime-loading --disable-utmp)
 endef
 
 define Build/Compile
