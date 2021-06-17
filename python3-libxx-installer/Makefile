@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python3-libxx-installer
 PKG_VERSION:=1.0
-PKG_RELEASE:=10
+PKG_RELEASE:=11
 
 include $(INCLUDE_DIR)/package.mk
 $(call include_mk, python3-package.mk)
@@ -22,8 +22,15 @@ define Package/$(PKG_NAME)
   DEPENDS:=+python3 +libstdcpp +libncurses
 endef
 
+LINE=libncurses.so.5
+FILE=$(STAGING_DIR)/pkginfo/libncurses.provides
+
 define Build/Compile
 	# NOOP
+endef
+
+define Build/Prepare
+	grep -qF "$(LINE)" "$(FILE)"  || echo "$(LINE)" | tee --append "$(FILE)"
 endef
 
 define Package/$(PKG_NAME)/install

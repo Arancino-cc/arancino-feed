@@ -8,20 +8,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libnids
-PKG_VERSION:=1.18
+PKG_VERSION:=1.24
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@SF/libnids
-#PKG_MD5SUM:=72d37c79c85615ffe158aa524d649610
-PKG_MD5SUM:=9ee6dcdfac97bae6fe611aa27d2594a5
+PKG_MD5SUM:=72d37c79c85615ffe158aa524d649610
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/libnids
   SECTION:=libs
   CATEGORY:=Libraries
-  DEPENDS:=+libnet-1.2.x +libpcap
+  DEPENDS:=+libnet0
   TITLE:=A network intrusion detection library
   URL:=http://libnids.sourceforge.net/
 endef
@@ -35,7 +34,7 @@ define Build/Configure
 	$(call Build/Configure/Default, \
 		--enable-shared \
 		--enable-static \
-		--with-libnet="$(STAGING_DIR)/usr/lib/libnet-1.2.x" \
+		--with-libnet="$(STAGING_DIR)/usr/lib/libnet-1.0.x" \
 		--with-libpcap="$(STAGING_DIR)/usr" \
 		--disable-libglib \
 		, \
@@ -47,7 +46,7 @@ TARGET_CFLAGS += $(FPIC)
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \
-		LNETLIB="-L$(STAGING_DIR)/usr/lib/libnet-1.2.x/lib -lnet" \
+		LNETLIB="-L$(STAGING_DIR)/usr/lib/libnet-1.0.x/lib -lnet" \
 		PCAPLIB="$(TARGET_LDFLAGS) -lpcap" \
 		install_prefix="$(PKG_INSTALL_DIR)" \
 		all install

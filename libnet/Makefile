@@ -1,24 +1,23 @@
-# 
-# Copyright (C) 2006 OpenWrt.org
+#
+# Copyright (C) 2006-2014 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
 #
-# $Id$
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=libnet
+PKG_NAME:=libnet0
 PKG_VERSION:=1.0.2a
-PKG_RELEASE:=7
+PKG_RELEASE:=9
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE:=libnet-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.packetfactory.net/libnet/dist/deprecated/
 PKG_MD5SUM:=ddf53f0f484184390e8c2a1bd0853667
-PKG_CAT:=zcat
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/Libnet-$(PKG_VERSION)
-PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/ipkg-install
+PKG_FIXUP:=autoreconf
+PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -34,6 +33,8 @@ ENDIANESS:=lil
 ifeq ($(CONFIG_BIG_ENDIAN),y)
   ENDIANESS:=big
 endif
+
+TARGET_CFLAGS += $(FPIC)
 
 CONFIGURE_ARGS += \
 	--enable-shared \
@@ -56,25 +57,13 @@ define Build/Configure
 	$(call Build/Configure/Default)
 endef
 
-define Build/Compile
-	# pass CFLAGS again to override -O2 set by configure
-	$(MAKE) -C $(PKG_BUILD_DIR) \
-		CFLAGS="$(TARGET_CFLAGS)" \
-		DESTDIR="$(PKG_INSTALL_DIR)" \
-		all install
-endef
-
 define Build/InstallDev
-	mkdir -p $(STAGING_DIR)/usr/lib/libnet-1.0.x/bin/
-	$(CP) $(PKG_INSTALL_DIR)/usr/bin/libnet-config $(STAGING_DIR)/usr/lib/libnet-1.0.x/bin/
-	mkdir -p $(STAGING_DIR)/usr/lib/libnet-1.0.x/include
-	$(CP) $(PKG_INSTALL_DIR)/usr/include/libnet* $(STAGING_DIR)/usr/lib/libnet-1.0.x/include/
-	mkdir -p $(STAGING_DIR)/usr/lib/libnet-1.0.x/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libnet.{a,so*} $(STAGING_DIR)/usr/lib/libnet-1.0.x/lib/
-endef
-
-define Build/UninstallDev
-	rm -rf $(STAGING_DIR)/usr/lib/libnet-1.0.x
+	$(INSTALL_DIR) $(1)/usr/lib/libnet-1.0.x/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/libnet-config $(1)/usr/lib/libnet-1.0.x/bin/
+	$(INSTALL_DIR) $(1)/usr/lib/libnet-1.0.x/include
+	$(CP) $(PKG_INSTALL_DIR)/usr/include/libnet* $(1)/usr/lib/libnet-1.0.x/include/
+	$(INSTALL_DIR) $(1)/usr/lib/libnet-1.0.x/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libnet.{a,so*} $(1)/usr/lib/libnet-1.0.x/lib/
 endef
 
 define Package/libnet0/install
