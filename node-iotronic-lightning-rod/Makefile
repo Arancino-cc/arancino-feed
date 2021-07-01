@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
 PKG_VERSION:=2.4.0
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
@@ -72,8 +72,8 @@ define Package/node-iotronic-lightning-rod/install
 	$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
 
 	mkdir -p $(1)/usr/bin
-	$(LN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/configure_LR_arancino.sh $(1)/usr/bin/configure_LR_arancino
-	$(LN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/board_bkp_rest.sh $(1)/usr/bin/board_bkp_rest
+	$(INSTALL_BIN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/configure_LR_arancino.sh $(1)/usr/bin/configure_LR_arancino
+	$(INSTALL_BIN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/board_bkp_rest.sh $(1)/usr/bin/board_bkp_rest
 
 	# Not overwrite settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/settings.example.json $(1)/var/lib/iotronic/settings.json
@@ -97,7 +97,7 @@ define Package/node-iotronic-lightning-rod/install
 	$(CP) ./files/etc/monit.d/* $(1)/etc/monit.d
 
 	# configure pluginExec
-	$(LN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/pluginExec/create_plugin_env $(1)/usr/bin/create_plugin_env
+	$(INSTALL_BIN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/pluginExec/create_plugin_env $(1)/usr/bin/create_plugin_env
 
 
 endef
