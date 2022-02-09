@@ -6,13 +6,13 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.4.0
-PKG_RELEASE:=5
+PKG_VERSION:=2.4.1
+PKG_RELEASE:=1
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
-PKG_HASH:=4e762925c62622e00befa171b5f58e0f823d370c
-PKG_SHORT_HASH:=4e762925
+PKG_HASH:=a7413e4862c1005e70395cd910fac3cf92d3abc4
+PKG_SHORT_HASH:=a7413e48
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-g$(PKG_SHORT_HASH).tar.gz
 PKG_SOURCE_URL:=ssh://git@git.smartme.io:20022/consulting/sacertis/iotronic-lightning-rod.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -66,7 +66,7 @@ define Package/node-iotronic-lightning-rod/install
 	mkdir -p $(1)/var/lib/iotronic
 	mkdir -p $(1)/var/lib/iotronic/plugins
 	mkdir -p $(1)/var/lib/iotronic/drivers
-	
+
 	# Manage Lightning-rod patches
 	mkdir -p $(1)/var/lib/iotronic/patches
 	$(CP) ./files/patches/* $(1)/var/lib/iotronic/patches
@@ -88,7 +88,7 @@ define Package/node-iotronic-lightning-rod/install
 	# $(INSTALL_DATA) $(PKG_BUILD_DIR)/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 	$(INSTALL_DATA) ./files/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 
-	# configure init.d 
+	# configure init.d
 	$(INSTALL_DIR) $(1)/etc/init-cfg/
 	$(INSTALL_BIN) ./files/etc/init-cfg/lightning-rod $(1)/etc/init-cfg/lightning-rod
 
@@ -156,7 +156,7 @@ fi
 if [ -e $${IPKG_INSTROOT}/etc/init.d/lightning-rod ]
 then
 	logger -t DEBUG "Updating init.d/lightning-rod"
-	cp $${IPKG_INSTROOT}/etc/init-cfg/lightning-rod $${IPKG_INSTROOT}/etc/init.d 
+	cp $${IPKG_INSTROOT}/etc/init-cfg/lightning-rod $${IPKG_INSTROOT}/etc/init.d
 fi
 
 if [ "`grep IOTRONIC_HOME $${IPKG_INSTROOT}/etc/profile`" == "" ]
@@ -178,10 +178,16 @@ else
         echo "Environment already configured"
 fi
 
+CRONTAB_VALUE="0 0 * * 0 /usr/sbin/logrotate -s /var/run/logrotate.status /etc/logrotate.d/lightning-rod.log"
+
 mkdir -p $${IPKG_INSTROOT}/etc/crontabs
+
 if ! grep -q "lightning-rod.log" $${IPKG_INSTROOT}/etc/crontabs/root; then
 	echo "Logrotate configured in cron"
-	echo $$'\n'"0 0 * * 0 /usr/sbin/logrotate /etc/logrotate.d/lightning-rod.log" >>$${IPKG_INSTROOT}/etc/crontabs/root; 
+	echo $${CRONTAB_VALUE} >>$${IPKG_INSTROOT}/etc/crontabs/root;
+else
+	echo "Logrotate already configured in cron, overwriting..."
+	sed -i "s|.*lightning-rod.*|$${CRONTAB_VALUE}|"  $${IPKG_INSTROOT}/etc/crontabs/root;
 fi
 
 #if [ "`grep $${IPKG_INSTROOT}/etc/init.d/lightning-rod $${IPKG_INSTROOT}/etc/crontabs/root`" == "" ]
