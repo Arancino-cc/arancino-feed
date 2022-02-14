@@ -184,7 +184,7 @@ mkdir -p $${IPKG_INSTROOT}/etc/crontabs
 
 if ! grep -q "lightning-rod.log" $${IPKG_INSTROOT}/etc/crontabs/root; then
 	echo "Logrotate configured in cron"
-	echo $${CRONTAB_VALUE} >>$${IPKG_INSTROOT}/etc/crontabs/root;
+	echo "$${CRONTAB_VALUE}" >>$${IPKG_INSTROOT}/etc/crontabs/root;
 else
 	echo "Logrotate already configured in cron, overwriting..."
 	sed -i "s|.*lightning-rod.*|$${CRONTAB_VALUE}|"  $${IPKG_INSTROOT}/etc/crontabs/root;
