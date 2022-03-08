@@ -9,7 +9,7 @@ PKG_NPM_NAME:=node-red
 PKG_NAME:=node-red
 #PKG_VERSION:=0.18.7
 PKG_VERSION:=0.19.6
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=http://registry.npmjs.com/$(PKG_NPM_NAME)/-/
@@ -79,6 +79,21 @@ then
     rm -rvf /opt/usr/lib/node/$(PKG_NPM_NAME)
 else
     rm -rvf /usr/lib/node/$(PKG_NPM_NAME)
+fi
+endef
+
+define Package/node-red/postinst
+#!/bin/sh
+mkdir -p $${IPKG_INSTROOT}/etc/crontabs
+
+CRONTAB_VALUE="0 0 * * 0 /usr/sbin/logrotate -s /var/run/logrotate.status /etc/logrotate.d/node-red.log"
+
+if ! grep -q "node-red.log" $${IPKG_INSTROOT}/etc/crontabs/root; then
+    echo "Logrotate configured in cron"
+    echo "$${CRONTAB_VALUE}" >>$${IPKG_INSTROOT}/etc/crontabs/root;
+else
+    echo "Logrotate already configured in cron, overwriting..."
+    sed -i "s|.*node-red.*|$${CRONTAB_VALUE}|" $${IPKG_INSTROOT}/etc/crontabs/root;
 fi
 endef
 
