@@ -32,7 +32,7 @@ local json = require "luci.json"
 local nixio = require "nixio"
 local fs = require "nixio.fs"
 
-local sys = require "luci.sys"
+local sysosjs = require "luci.sysosjs"
 --local init = require "luci.init"
 
 local curl = nil
@@ -524,7 +524,7 @@ end
 
 local function get_wlans(device)
 
-  local iw = sys.wifi.getiwinfo(device)
+  local iw = sysosjs.wifi.getiwinfo(device)
 
   local function percent_wifi_signal(info)
     local qc = info.quality or 0
@@ -697,20 +697,20 @@ function api_request(request, response, meth, iargs)
     local timezone = fs.readfile("/etc/TZ") or "UTC"
     -- timezone = timezone:gsub('%W', '')
 
-    local metrics = {sys.sysinfo()}
-    metrics[8] = sys.uptime()
+    local metrics = {sysosjs.sysinfo()}
+    metrics[8] = sysosjs.uptime()
 
     data = {
       metrics = metrics,
-      hostname = sys.hostname(),
+      hostname = sysosjs.hostname(),
       timezone = timezone,
       rest = console("sh " .. ROOTDIR .. "/bin/arancino-toggle-rest-api.sh")
     }
   elseif meth == "setsysinfo" then
-    local hostname = iargs.hostname or sys.hostname()
+    local hostname = iargs.hostname or sysosjs.hostname()
     local timezone = iargs.timezone or false
 
-    sys.hostname(hostname)
+    sysosjs.hostname(hostname)
 
     if timezone then
       fs.writefile("/etc/TZ", timezone)
@@ -721,23 +721,23 @@ function api_request(request, response, meth, iargs)
     console("/sbin/uci commit system")
     data = true
   elseif meth == "reboot" then
-    sys.reboot()
+    sysosjs.reboot()
     data = true
   elseif meth == "netdevices" then
     data = {
-      devices = sys.net.devices(),
+      devices = sysosjs.net.devices(),
       platform = console("/sbin/uci get wireless.radio0.path | sed 's/platform\.//'")
     }
   elseif meth == "netstatus" then
     data = iface_status(iargs["device"])
   elseif meth == "netinfo" then
     data = {
-      deviceinfo = sys.net.deviceinfo(),
+      deviceinfo = sysosjs.net.deviceinfo(),
       ifconfig = json.decode(console("sh " .. ROOTDIR .. "/bin/arancino-ifconfig.sh"))
     }
   elseif meth == "iwinfo" then
     -- local device = iargs["device"] or "wlan0"
-    -- data = sys.wifi.getiwinfo(device)
+    -- data = sysosjs.wifi.getiwinfo(device)
     data = json.decode(console("sh " .. ROOTDIR .. "/bin/arancino-wifi-info.sh"))
   elseif meth == "rest" then
     data = console("sh " .. ROOTDIR .. "/bin/arancino-toggle-rest-api.sh " .. iargs["enabled"])
@@ -745,16 +745,16 @@ function api_request(request, response, meth, iargs)
     local device = iargs["device"] or "radio0"
     data = get_wlans(device)
   elseif meth == "ps" then
-    data = sys.process.list()
+    data = sysosjs.process.list()
   elseif meth == "kill" then
     data = nixio.kill(iargs.pid, iargs.signal)
   elseif meth == "dmesg" then
-    data = sys.dmesg()
+    data = sysosjs.dmesg()
   elseif meth == "syslog" then
-    data = sys.syslog()
+    data = sysosjs.syslog()
   elseif meth == "setpasswd" then
     local username = get_username(request, response)
-    data = sys.user.setpasswd(username, iargs["password"]) == 0
+    data = sysosjs.user.setpasswd(username, iargs["password"]) == 0
   elseif meth == "wifi" then
     local cssid = iargs["ssid"]:gsub("%$", "\\$")
     local cpass = iargs["password"]:gsub("%$", "\\$")
@@ -786,7 +786,7 @@ function api_request(request, response, meth, iargs)
   elseif meth == "wizardboardconfig" then
     if iargs["password"] ~= nil then
       local username = get_username(request, response)
-      data = sys.user.setpasswd(username, iargs["password"]) == 0
+      data = sysosjs.user.setpasswd(username, iargs["password"]) == 0
     end
     console("echo " .. get_wizard_board_config_command(iargs) .. " >> /tmp/os.log")
     data = console(get_wizard_board_config_command(iargs))

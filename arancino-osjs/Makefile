@@ -9,15 +9,17 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arancino-osjs
 PKG_VERSION:=1.0
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/arancino-osjs
-  SECTION:=utils
-  CATEGORY:=Utilities
+  SECTION:=luci
+  CATEGORY:=LuCI
+  SUBMENU:=3. Applications
   TITLE:=Custom Arancino Osjs support package
   DEFAULT:=m
+  DEPENDS:=+luci +luci-lib-json +lua-coxpcall +lua-wsapi-base +lua-wsapi-xavante +lua-base64 +lua-xavante +luafilesystem +iw
 endef
 
 define Build/Compile
@@ -25,13 +27,15 @@ define Build/Compile
 endef
 
 define Package/arancino-osjs/install
-	$(INSTALL_DIR) $(1)/usr/lib/
 	$(INSTALL_DIR) $(1)/osjs
+	$(INSTALL_DIR) $(1)/usr/lib/lua
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 
-	$(CP) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
 	$(CP) ./files/osjs/* $(1)/osjs
-	$(CP) ./files/usr/lib/* $(1)/usr/lib
+	$(CP) ./files/usr/lib/lua/osjs.lua $(1)/usr/lib/lua
+	$(CP) ./files/usr/lib/lua/luci/sysosjs.lua $(1)/usr/lib/lua/luci
+	$(CP) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults
 endef
 
 define Package/arancino-osjs/postinst
