@@ -41,7 +41,7 @@ local tonumber, ipairs, pairs, pcall, type, next, setmetatable, require, select 
 
 
 --- LuCI Linux and POSIX system utilities.
-module "luci.sys"
+module "luci.sysosjs"
 
 --- Execute a given shell command and return the error code
 -- @class		function
