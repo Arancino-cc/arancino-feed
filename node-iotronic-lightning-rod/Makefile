@@ -6,13 +6,13 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=iotronic-lightning-rod
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=2.4.1
+PKG_VERSION:=2.5.0
 PKG_RELEASE:=1
 PKG_ORG:=@mdslab
 
 PKG_SOURCE_PROTO:=git
-PKG_HASH:=e8f796fddb430530bd07544da6136de3a027bcc0
-PKG_SHORT_HASH:=e8f796fd
+PKG_HASH:=069459659b6c158125daf2b1bc6920964af8bf2e
+PKG_SHORT_HASH:=06945965
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-g$(PKG_SHORT_HASH).tar.gz
 PKG_SOURCE_URL:=ssh://git@git.smartme.io:20022/consulting/sacertis/iotronic-lightning-rod.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -29,7 +29,7 @@ define Package/node-iotronic-lightning-rod
   CATEGORY:=Languages
   TITLE:=Stack4Things Lightning-rod
   URL:=https://www.npmjs.org/package/iotronic-lightning-rod
-  DEPENDS:=+node +libfuse +libpthread +libc +gdb +node-lsof +patch +logrotate
+  DEPENDS:=+node +libfuse +libpthread +libc +gdb +node-lsof +patch +logrotate +procps-ng-ps +node-q
 endef
 
 define Package/node-iotronic-lightning-rod/description
@@ -74,6 +74,7 @@ define Package/node-iotronic-lightning-rod/install
 	mkdir -p $(1)/usr/bin
 	$(INSTALL_BIN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/configure_LR_arancino.sh $(1)/usr/bin/configure_LR_arancino
 	$(INSTALL_BIN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/install/arancino/board_bkp_rest.sh $(1)/usr/bin/board_bkp_rest
+	$(INSTALL_BIN) $(1)/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/utils/pluginsCheck $(1)/usr/bin/pluginsCheck
 
 	# Not overwrite settings.json
 	#$(CP) $(1)/usr/lib/node_modules/$(PKG_ORG)/$(PKG_NPM_NAME)/settings.example.json $(1)/var/lib/iotronic/settings.json
@@ -84,7 +85,7 @@ define Package/node-iotronic-lightning-rod/install
 	mkdir -p $(1)/var/log/iotronic
 	mkdir -p $(1)/var/log/iotronic/plugins
 	mkdir -p $(1)/etc/logrotate.d
-	touch $(1)/var/log/iotronic/lightning-rod.log
+	# touch $(1)/var/log/iotronic/lightning-rod.log
 	# $(INSTALL_DATA) $(PKG_BUILD_DIR)/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 	$(INSTALL_DATA) ./files/etc/logrotate.d/lightning-rod.log $(1)/etc/logrotate.d/lightning-rod.log
 
@@ -134,6 +135,15 @@ else
 	cp $${IPKG_INSTROOT}/usr/lib/node_modules/@mdslab/iotronic-lightning-rod/modules/drivers-manager/drivers.example.json $${IPKG_INSTROOT}/var/lib/iotronic/drivers/drivers.json
 fi
 
+if [ -e $${IPKG_INSTROOT}/var/log/iotronic/lightning-rod.log ]
+then
+       # leave the system as it is
+       logger -t DEBUG "LOG file already present"
+else
+       # set the new log file
+       touch $${IPKG_INSTROOT}/var/log/iotronic/lightning-rod.log
+       logger -t DEBUG "LOG file missing. Adding a default one"
+fi
 
 if [ -e $${IPKG_INSTROOT}/etc/iotronic/authentication.json ]
 then

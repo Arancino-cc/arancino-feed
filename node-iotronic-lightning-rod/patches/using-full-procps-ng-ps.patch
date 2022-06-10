@@ -1,0 +1,39 @@
+diff --git a/modules/board-manager/board-management.js b/modules/board-manager/board-management.js
+index fdc95f0..659436d 100644
+--- a/modules/board-manager/board-management.js
++++ b/modules/board-manager/board-management.js
+@@ -1546,7 +1546,7 @@ exports.execAction = function(args){
+                     var find_process = params["process"];
+                     //logger.info("[SYSTEM] --> process filter: " + JSON.stringify(find_process));
+ 
+-                    exec('ps lx | grep ' + find_process + '| grep -v grep ', function (error, stdout, stderr) {
++                    exec('procps-ng-ps lx | grep ' + find_process + '| grep -v grep ', function (error, stdout, stderr) {
+                     
+                       try {
+                     
+diff --git a/modules/plugins-manager/manage-plugins.js b/modules/plugins-manager/manage-plugins.js
+index 9931b47..7c6ca76 100644
+--- a/modules/plugins-manager/manage-plugins.js
++++ b/modules/plugins-manager/manage-plugins.js
+@@ -68,7 +68,7 @@ function checkPluginAlive(plugin_name){
+ 	var d = Q.defer();
+ 
+ 
+-	exec('ps lx | grep /plugins-manager.*' + plugin_name + '| grep -v grep', function (error, stdout, stderr) {
++	exec('procps-ng-ps lx | grep /plugins-manager.*' + plugin_name + '| grep -v grep', function (error, stdout, stderr) {
+ 
+ 		try {
+ 	  
+diff --git a/utils/pluginsCheck b/utils/pluginsCheck
+index 29eaaa3..361c100 100644
+--- a/utils/pluginsCheck
++++ b/utils/pluginsCheck
+@@ -51,7 +51,7 @@ function checkPluginAlive(plugin_name, plugin_bundle){
+         var autostart = plugin_bundle.autostart;
+         var version = plugin_bundle.version;    
+ 
+-        exec('ps lx | grep /plugins-manager.*' + plugin_name + '| grep -v grep', function (error, stdout, stderr) {
++        exec('procps-ng-ps lx | grep /plugins-manager.*' + plugin_name + '| grep -v grep', function (error, stdout, stderr) {
+ 
+             try {
+ 

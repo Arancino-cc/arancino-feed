@@ -1,0 +1,13 @@
+diff --git a/scripts/postinst b/scripts/postinst
+index bfa6438..83647b3 100755
+--- a/scripts/postinst
++++ b/scripts/postinst
+@@ -80,7 +80,7 @@ if [ "$rm_check" = "no" ] || [ ! -d "$IOTRONIC_HOME" ]; then
+     chmod +x $NODE_PATH/@mdslab/iotronic-lightning-rod/lr-server.js
+ 
+     mkdir -p /var/log/iotronic/plugins
+-    touch /var/log/iotronic/lightning-rod.log
++    # touch /var/log/iotronic/lightning-rod.log
+ 
+ fi
+ 
